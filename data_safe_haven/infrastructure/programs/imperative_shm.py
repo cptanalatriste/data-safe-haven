@@ -147,7 +147,12 @@ class ImperativeSHM:
         try:
             graph_api.create_application(
                 self.context.entra_application_name,
-                application_scopes=["Group.ReadWrite.All"],
+                application_scopes=[
+                    "Application.ReadWrite.All",
+                    "AppRoleAssignment.ReadWrite.All",
+                    "Directory.ReadWrite.All",
+                    "Group.ReadWrite.All",
+                ],
                 delegated_scopes=[],
                 request_json={
                     "displayName": self.context.entra_application_name,
