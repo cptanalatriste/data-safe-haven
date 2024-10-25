@@ -98,7 +98,9 @@ def deploy(
         if not application:
             msg = f"No Entra application '{context.entra_application_name}' was found. Please redeploy your SHM."
             raise DataSafeHavenConfigError(msg)
-        stack.add_option("azuread:clientId", application.get("appId", ""), replace=True)
+        stack.add_option(
+            "azuread:clientId", application.get("appId", ""), replace=False
+        )
         if not context.entra_application_secret:
             msg = f"No Entra application secret '{context.entra_application_secret_name}' was found. Please redeploy your SHM."
             raise DataSafeHavenConfigError(msg)
@@ -106,7 +108,7 @@ def deploy(
             "azuread:clientSecret", context.entra_application_secret, replace=True
         )
         stack.add_option(
-            "azuread:tenantId", shm_config.shm.entra_tenant_id, replace=True
+            "azuread:tenantId", shm_config.shm.entra_tenant_id, replace=False
         )
         # Load SHM outputs
         stack.add_option(
