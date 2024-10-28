@@ -181,12 +181,9 @@ As some general recommendations,
 The [Guacamole clipboard](https://guacamole.apache.org/doc/gug/using-guacamole.html#using-the-clipboard) provides an interface between the local clipboard and the clipboard on the remote workspaces.
 Only text is allowed to be passed through the Guacamole clipboard.
 
-Copy and pasting of text to or from SRE workspaces via the Guacamole clipboard can be configured with the `allow_copy` and `allow_paste` settings.
-
+The ability to copy and paste text to or from SRE workspaces via the Guacamole clipboard can be controlled with the DSH configuration parameters `allow_copy` and `allow_paste`.
 `allow_copy` allows users to copy text from an SRE workspace to the Guacamole clipboard.
-
 `allow_paste` allows users to paste text into an SRE workspace from the Guacamole clipboard.
-
 These options have no impact on the ability to use copy and paste within a workspace.
 
 The impact of setting each of these options is detailed in the below table.
