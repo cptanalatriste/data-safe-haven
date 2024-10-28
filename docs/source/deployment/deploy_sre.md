@@ -67,8 +67,8 @@ sre:
     - # You can also use the tag 'Internet' instead of a list
   software_packages: # Which Python/R packages to allow users to install: [any/pre-approved/none]
   storage_quota_gb:
-    home: # Total size in GiB across all home directories .
-    shared: #Total size in GiB for the shared directories .
+    home: # Total size in GiB across all home directories
+    shared: #Total size in GiB for the shared directories
   timezone: # Timezone in pytz format (eg. Europe/London)
   workspace_skus: # List of Azure VM SKUs that will be used for data analysis.
 :::
