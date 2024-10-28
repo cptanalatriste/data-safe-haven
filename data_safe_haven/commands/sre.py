@@ -204,7 +204,9 @@ def teardown(
             "including all data stored in the environment.\n"
             "Ensure that any desired outputs have been extracted before continuing."
         )
-        if not console.confirm("Do you wish to continue tearing down the SRE?", default_to_yes=True):
+        if not console.confirm(
+            "Do you wish to continue tearing down the SRE?", default_to_yes=True
+        ):
             logger.info("SRE teardown cancelled by user.")
             raise typer.Exit(0)
 
