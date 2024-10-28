@@ -5,6 +5,7 @@ from data_safe_haven.exceptions import (
 )
 from data_safe_haven.external import AzureSdk, GraphApi
 from data_safe_haven.logging import get_logger
+from data_safe_haven.types import EntraSignInAudienceType
 
 
 class ImperativeSHM:
@@ -156,7 +157,7 @@ class ImperativeSHM:
                 delegated_scopes=[],
                 request_json={
                     "displayName": self.context.entra_application_name,
-                    "signInAudience": "AzureADMyOrg",
+                    "signInAudience": EntraSignInAudienceType.THIS_TENANT.value,
                 },
             )
             # Always recreate the application secret.

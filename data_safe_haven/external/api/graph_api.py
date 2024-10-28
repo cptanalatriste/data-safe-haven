@@ -17,7 +17,7 @@ from data_safe_haven.exceptions import (
     DataSafeHavenValueError,
 )
 from data_safe_haven.logging import get_logger, get_null_logger
-from data_safe_haven.types import EntraAppPermissionType
+from data_safe_haven.types import EntraAppPermissionType, EntraSignInAudienceType
 
 from .credentials import DeferredCredential, GraphApiCredential
 
@@ -201,7 +201,7 @@ class GraphApi:
                                 "urn:ietf:wg:oauth:2.0:oob",
                             ]
                         },
-                        "signInAudience": "AzureADMyOrg",
+                        "signInAudience": EntraSignInAudienceType.THIS_TENANT.value,
                     }
                 # Add scopes if there are any
                 scopes = [

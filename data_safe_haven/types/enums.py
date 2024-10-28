@@ -44,6 +44,14 @@ class EntraAppPermissionType(str, Enum):
 
 
 @verify(UNIQUE)
+class EntraSignInAudienceType(str, Enum):
+    ANY_TENANT = "AzureADMultipleOrgs"
+    ANY_TENANT_OR_PERSONAL = "AzureADandPersonalMicrosoftAccount"
+    PERSONAL = "PersonalMicrosoftAccount"
+    THIS_TENANT = "AzureADMyOrg"
+
+
+@verify(UNIQUE)
 class FirewallPriorities(int, Enum):
     """Priorities for firewall rules."""
 

@@ -7,7 +7,7 @@ import pulumi_azuread as entra
 from pulumi import ComponentResource, Input, Output, ResourceOptions
 
 from data_safe_haven.functions import replace_separators
-from data_safe_haven.types import EntraAppPermissionType
+from data_safe_haven.types import EntraAppPermissionType, EntraSignInAudienceType
 
 
 class EntraApplicationProps:
@@ -124,7 +124,7 @@ class EntraApplicationComponent(ComponentResource):
                 if props.application_permissions
                 else []
             ),
-            sign_in_audience="AzureADMyOrg",
+            sign_in_audience=EntraSignInAudienceType.THIS_TENANT.value,
             **props.application_kwargs,
         )
 
