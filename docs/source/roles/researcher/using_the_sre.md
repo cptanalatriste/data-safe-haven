@@ -703,3 +703,13 @@ The data can be read into a dataframe for local analysis.
     head(df, 3)
     :::
 ::::
+
+## Copy and paste
+
+It is always possible to use copy and paste as normal within an SRE workspace.
+
+However, the ability to copy and paste text to or from an SRE workspace depends on the specific configuration of the SRE.
+
+The {ref}`system manager <role_system_manager>` can configure the SRE workspaces to allow copying text from a workspace, pasting text into a workspace, both, or neither.
+
+Copy and paste of anything other than text to or from a workspace is always disabled.
