@@ -176,7 +176,7 @@ As some general recommendations,
 
 :::
 
-### Copy and paste
+#### Copy and paste
 
 The [Guacamole clipboard](https://guacamole.apache.org/doc/gug/using-guacamole.html#using-the-clipboard) provides an interface between the local clipboard and the clipboard on the remote workspaces.
 Only text is allowed to be passed through the Guacamole clipboard.
