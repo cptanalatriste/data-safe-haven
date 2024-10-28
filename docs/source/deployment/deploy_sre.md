@@ -192,7 +192,7 @@ These options have no impact on the ability to use copy and paste within a works
 The impact of setting each of these options is detailed in the below table.
 
 | allow_copy | allow_paste | Copy/paste within workspace | Copy/paste between workspaces | Copy to local machine | Paste from local machine |
-|--------|--------|--------|--|---|--|
+|-----|-----|-----|-----|-----|-----|
 | true | true | yes | yes | yes | yes |
 | true | false |  yes | no | yes | no |
 | false | true | yes | no | no | yes|
