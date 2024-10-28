@@ -149,10 +149,10 @@ class ImperativeSHM:
             graph_api.create_application(
                 self.context.entra_application_name,
                 application_scopes=[
-                    "Application.ReadWrite.All",
-                    "AppRoleAssignment.ReadWrite.All",
-                    "Directory.ReadWrite.All",
-                    "Group.ReadWrite.All",
+                    "Application.ReadWrite.All",  # For creating applications
+                    "AppRoleAssignment.ReadWrite.All",  # For application permissions
+                    "Directory.ReadWrite.All",  # For creating/deleting groups
+                    "Group.ReadWrite.All",  # For creating/deleting groups
                 ],
                 delegated_scopes=[],
                 request_json={
