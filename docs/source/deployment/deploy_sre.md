@@ -75,13 +75,17 @@ sre:
 
 ::::
 
-:::{admonition} Supported Azure regions
-:class: dropdown important
+### Configuration guidance
+
+#### Choosing an Azure region
 
 Some of the SRE resources are not available in all Azure regions.
 
 - Workspace virtual machines use zone redundant storage managed disks which have [limited regional availability](https://learn.microsoft.com/en-us/azure/virtual-machines/disks-redundancy).
 - Some shares mounted on workspace virtual machines require premium file shares which have [limited regional availability](https://learn.microsoft.com/en-us/azure/storage/files/redundancy-premium-file-shares).
+
+:::{admonition} Supported Azure regions
+:class: dropdown important
 
 The regions which satisfy all requirements are,
 
@@ -116,6 +120,8 @@ The regions which satisfy all requirements are,
 - West US 3
 
 :::
+
+#### Choosing a VM SKU
 
 :::{hint}
 See [here](https://learn.microsoft.com/en-us/azure/virtual-machines/sizes/) for a full list of valid Azure VM SKUs.
@@ -169,6 +175,28 @@ As some general recommendations,
     Alternatively a series with more recent GPUs should give better performance.
 
 :::
+
+### Copy and paste
+
+The [Guacamole clipboard](https://guacamole.apache.org/doc/gug/using-guacamole.html#using-the-clipboard) provides an interface between the local clipboard and the clipboard on the remote workspaces.
+Only text is allowed to be passed through the Guacamole clipboard.
+
+Copy and pasting of text to or from SRE workspaces via the Guacamole clipboard can be configured with the `allow_copy` and `allow_paste` settings.
+
+`allow_copy` allows users to copy text from an SRE workspace to the Guacamole clipboard.
+
+`allow_paste` allows users to paste text into an SRE workspace from the Guacamole clipboard.
+
+These options have no impact on the ability to use copy and paste within a workspace.
+
+The impact of setting each of these options is detailed in the below table.
+
+| allow_copy | allow_paste | Copy/paste within workspace | Copy/paste between workspaces | Copy to local machine | Paste from local machine |
+|--------|--------|--------|--|---|--|
+| true | true | yes | yes | yes | yes |
+| true | false |  yes | no | yes | no |
+| false | true | yes | no | no | yes|
+| false | false | yes | no | no | no |
 
 ## Upload the configuration file
 
