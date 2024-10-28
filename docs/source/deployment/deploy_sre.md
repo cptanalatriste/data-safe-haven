@@ -46,6 +46,7 @@ $ dsh config template --file PATH_YOU_WANT_TO_SAVE_YOUR_YAML_FILE_TO \
 
 :::{code} yaml
 azure:
+  location: # Azure location where SRE resources will be deployed
   subscription_id: # ID of the Azure subscription that the TRE will be deployed to
   tenant_id: # Home tenant for the Azure account used to deploy infrastructure: `az account show`
 description: # A free-text description of your SRE deployment
@@ -61,8 +62,13 @@ sre:
   remote_desktop:
     allow_copy: # True/False: whether to allow copying text out of the environment
     allow_paste: # True/False: whether to allow pasting text into the environment
-  research_user_ip_addresses: # List of IP addresses belonging to users
+  research_user_ip_addresses:
+    - # List of IP addresses belonging to users
+    - # You can also use the tag 'Internet' instead of a list
   software_packages: # Which Python/R packages to allow users to install: [any/pre-approved/none]
+  storage_quota_gb:
+    home: # Total size in GiB across all home directories .
+    shared: #Total size in GiB for the shared directories .
   timezone: # Timezone in pytz format (eg. Europe/London)
   workspace_skus: # List of Azure VM SKUs that will be used for data analysis.
 :::
