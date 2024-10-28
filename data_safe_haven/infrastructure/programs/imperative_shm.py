@@ -175,7 +175,7 @@ class ImperativeSHM:
         pulumi_config = DSHPulumiConfig.from_remote(self.context)
         deployed = pulumi_config.project_names
         if deployed:
-            logger.info(f"Found deployed Pulumi SREs: {deployed}.")
+            logger.info(f"Found deployed SREs: {deployed}.")
             msg = "Deployed SREs must be torn down before the SHM can be torn down."
             raise DataSafeHavenAzureError(msg)
         try:
