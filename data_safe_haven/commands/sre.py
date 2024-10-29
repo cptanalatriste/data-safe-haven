@@ -66,7 +66,6 @@ def deploy(
             config=sre_config,
             pulumi_config=pulumi_config,
             create_project=True,
-            graph_api_token=graph_api.token,
         )
         # Set Azure options
         stack.add_option(
@@ -99,7 +98,9 @@ def deploy(
         if not application:
             msg = f"No Entra application '{context.entra_application_name}' was found. Please redeploy your SHM."
             raise DataSafeHavenConfigError(msg)
-        stack.add_option("azuread:clientId", application.get("appId", ""), replace=True)
+        stack.add_option(
+            "azuread:clientId", application.get("appId", ""), replace=False
+        )
         if not context.entra_application_secret:
             msg = f"No Entra application secret '{context.entra_application_secret_name}' was found. Please redeploy your SHM."
             raise DataSafeHavenConfigError(msg)
@@ -107,7 +108,7 @@ def deploy(
             "azuread:clientSecret", context.entra_application_secret, replace=True
         )
         stack.add_option(
-            "azuread:tenantId", shm_config.shm.entra_tenant_id, replace=True
+            "azuread:tenantId", shm_config.shm.entra_tenant_id, replace=False
         )
         # Load SHM outputs
         stack.add_option(
@@ -153,7 +154,6 @@ def deploy(
 
         # Provision SRE with anything that could not be done in Pulumi
         manager = SREProvisioningManager(
-            graph_api_token=graph_api.token,
             location=sre_config.azure.location,
             sre_name=sre_config.name,
             sre_stack=stack,
@@ -183,15 +183,8 @@ def teardown(
     """Tear down a deployed a Secure Research Environment."""
     logger = get_logger()
     try:
-        # Load context and SHM config
+        # Load context
         context = ContextManager.from_file().assert_context()
-        shm_config = SHMConfig.from_remote(context)
-
-        # Load GraphAPI as this may require user-interaction
-        graph_api = GraphApi.from_scopes(
-            scopes=["Application.ReadWrite.All", "Group.ReadWrite.All"],
-            tenant_id=shm_config.shm.entra_tenant_id,
-        )
 
         # Load Pulumi and SRE configs
         pulumi_config = DSHPulumiConfig.from_remote(context)
@@ -212,7 +205,6 @@ def teardown(
             context=context,
             config=sre_config,
             pulumi_config=pulumi_config,
-            graph_api_token=graph_api.token,
             create_project=True,
         )
         stack.teardown(force=force)
