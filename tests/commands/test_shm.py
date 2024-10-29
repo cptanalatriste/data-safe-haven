@@ -1,7 +1,5 @@
-from rich.prompt import Confirm
-
 from data_safe_haven.commands.shm import shm_command_group
-
+from data_safe_haven.config import DSHPulumiConfig
 
 class TestDeploySHM:
     def test_infrastructure_deploy(
@@ -48,8 +46,7 @@ class TestTeardownSHM:
         mock_imperative_shm_teardown_then_exit,  # noqa: ARG002
         mock_shm_config_from_remote,  # noqa: ARG002
     ):
-        mocker.patch.object(Confirm, "ask", return_value="yes")
-        result = runner.invoke(shm_command_group, ["teardown"])
+        result = runner.invoke(shm_command_group, ["teardown"], input="y")
         assert result.exit_code == 1
         assert "mock teardown" in result.stdout
 
@@ -73,3 +70,15 @@ class TestTeardownSHM:
         assert "mock get_credential\n" in result.stdout
         assert "mock get_credential error" in result.stdout
         assert "Could not teardown Safe Haven Management environment." in result.stdout
+
+    def test_teardown_sres_exist(
+        self,
+        mocker,
+        runner,
+        mock_azuresdk_get_subscription_name, # noqa: ARG002
+        mock_pulumi_config_from_remote,  # noqa: ARG002
+        mock_shm_config_from_remote,  # noqa: ARG002
+    ):
+        result = runner.invoke(shm_command_group, ["teardown"], input="y")
+        assert result.exit_code == 1
+        assert "Found deployed SREs" in result.stdout
