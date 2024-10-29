@@ -5,6 +5,7 @@ from data_safe_haven.exceptions import (
 )
 from data_safe_haven.external import AzureSdk, GraphApi
 from data_safe_haven.logging import get_logger
+from data_safe_haven.types import EntraSignInAudienceType
 
 
 class ImperativeSHM:
@@ -147,11 +148,16 @@ class ImperativeSHM:
         try:
             graph_api.create_application(
                 self.context.entra_application_name,
-                application_scopes=["Group.ReadWrite.All"],
+                application_scopes=[
+                    "Application.ReadWrite.All",  # For creating applications
+                    "AppRoleAssignment.ReadWrite.All",  # For application permissions
+                    "Directory.ReadWrite.All",  # For creating/deleting groups
+                    "Group.ReadWrite.All",  # For creating/deleting groups
+                ],
                 delegated_scopes=[],
                 request_json={
                     "displayName": self.context.entra_application_name,
-                    "signInAudience": "AzureADMyOrg",
+                    "signInAudience": EntraSignInAudienceType.THIS_TENANT.value,
                 },
             )
             # Always recreate the application secret.
