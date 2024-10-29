@@ -113,8 +113,7 @@ class TestTeardownSRE:
         mock_sre_config_from_remote,  # noqa: ARG002
         mock_sre_project_manager_teardown_then_exit,  # noqa: ARG002
     ) -> None:
-        mocker.patch.object(Confirm, "ask", return_value="yes")
-        result = runner.invoke(sre_command_group, ["teardown", "sandbox"])
+        result = runner.invoke(sre_command_group, ["teardown", "sandbox"], input="y")
         assert result.exit_code == 1
         assert "mock teardown" in result.stdout
 
