@@ -79,3 +79,14 @@ class TestTeardownSHM:
         result = runner.invoke(shm_command_group, ["teardown"], input="y")
         assert result.exit_code == 1
         assert "Found deployed SREs" in result.stdout
+
+    def test_teardown_user_cancelled(
+        self,
+        runner,
+        mock_azuresdk_get_subscription_name,  # noqa: ARG002
+        mock_pulumi_config_from_remote,  # noqa: ARG002
+        mock_shm_config_from_remote,  # noqa: ARG002
+    ):
+        result = runner.invoke(shm_command_group, ["teardown"], input="n")
+        assert result.exit_code == 0
+        assert "cancelled" in result.stdout
