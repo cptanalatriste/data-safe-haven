@@ -17,7 +17,11 @@ from data_safe_haven.exceptions import (
     DataSafeHavenValueError,
 )
 from data_safe_haven.logging import get_logger, get_null_logger
-from data_safe_haven.types import EntraAppPermissionType, EntraSignInAudienceType
+from data_safe_haven.types import (
+    EntraApplicationId,
+    EntraAppPermissionType,
+    EntraSignInAudienceType,
+)
 
 from .credentials import DeferredCredential, GraphApiCredential
 
@@ -25,9 +29,6 @@ from .credentials import DeferredCredential, GraphApiCredential
 class GraphApi:
     """Interface to the Microsoft Graph REST API"""
 
-    application_ids: ClassVar[dict[str, str]] = {
-        "Microsoft Graph": "00000003-0000-0000-c000-000000000000",
-    }
     role_template_ids: ClassVar[dict[str, str]] = {
         "Global Administrator": "62e90394-69f5-4237-9190-012177145e10"
     }
@@ -220,7 +221,7 @@ class GraphApi:
                 if scopes:
                     request_json["requiredResourceAccess"] = [
                         {
-                            "resourceAppId": self.application_ids["Microsoft Graph"],
+                            "resourceAppId": EntraApplicationId.MICROSOFT_GRAPH.value,
                             "resourceAccess": scopes,
                         }
                     ]

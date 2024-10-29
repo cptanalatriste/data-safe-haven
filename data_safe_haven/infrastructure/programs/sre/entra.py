@@ -11,7 +11,7 @@ from data_safe_haven.infrastructure.components import (
     EntraDesktopApplicationProps,
     EntraWebApplicationProps,
 )
-from data_safe_haven.types import EntraAppPermissionType
+from data_safe_haven.types import EntraApplicationId, EntraAppPermissionType
 
 
 class SREEntraProps:
@@ -54,12 +54,9 @@ class SREEntraComponent(ComponentResource):
             )
 
         # Get the Microsoft Graph service principal
-        well_known = entra.get_application_published_app_ids_output()
         msgraph_service_principal = entra.ServicePrincipal(
             f"{self._name}_microsoft_graph_service_principal",
-            client_id=well_known.apply(
-                lambda app_ids: app_ids.result["MicrosoftGraph"]
-            ),
+            client_id=EntraApplicationId.MICROSOFT_GRAPH.value,
             use_existing=True,
         )
 

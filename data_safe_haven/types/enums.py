@@ -38,6 +38,11 @@ class DatabaseSystem(str, Enum):
 
 
 @verify(UNIQUE)
+class EntraApplicationId(str, Enum):
+    MICROSOFT_GRAPH = "00000003-0000-0000-c000-000000000000"
+
+
+@verify(UNIQUE)
 class EntraAppPermissionType(str, Enum):
     APPLICATION = "Role"
     DELEGATED = "Scope"
