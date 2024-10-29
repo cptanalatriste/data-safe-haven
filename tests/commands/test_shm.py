@@ -1,5 +1,5 @@
 from data_safe_haven.commands.shm import shm_command_group
-from data_safe_haven.config import DSHPulumiConfig
+
 
 class TestDeploySHM:
     def test_infrastructure_deploy(
@@ -72,9 +72,8 @@ class TestTeardownSHM:
 
     def test_teardown_sres_exist(
         self,
-        mocker,
         runner,
-        mock_azuresdk_get_subscription_name, # noqa: ARG002
+        mock_azuresdk_get_subscription_name,  # noqa: ARG002
         mock_pulumi_config_from_remote,  # noqa: ARG002
         mock_shm_config_from_remote,  # noqa: ARG002
     ):
