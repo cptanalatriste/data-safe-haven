@@ -1,5 +1,6 @@
 from pytest import CaptureFixture, LogCaptureFixture
 from pytest_mock import MockerFixture
+from rich.prompt import Confirm
 from typer.testing import CliRunner
 
 from data_safe_haven.commands.sre import sre_command_group
@@ -103,6 +104,7 @@ class TestDeploySRE:
 class TestTeardownSRE:
     def test_teardown(
         self,
+        mocker: MockerFixture,
         runner: CliRunner,
         mock_graph_api_token,  # noqa: ARG002
         mock_ip_1_2_3_4,  # noqa: ARG002
@@ -111,6 +113,7 @@ class TestTeardownSRE:
         mock_sre_config_from_remote,  # noqa: ARG002
         mock_sre_project_manager_teardown_then_exit,  # noqa: ARG002
     ) -> None:
+        mocker.patch.object(Confirm, "ask", return_value="yes")
         result = runner.invoke(sre_command_group, ["teardown", "sandbox"])
         assert result.exit_code == 1
         assert "mock teardown" in result.stdout

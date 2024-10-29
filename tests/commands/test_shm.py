@@ -1,3 +1,5 @@
+from rich.prompt import Confirm
+
 from data_safe_haven.commands.shm import shm_command_group
 
 
@@ -41,10 +43,12 @@ class TestDeploySHM:
 class TestTeardownSHM:
     def test_teardown(
         self,
+        mocker,
         runner,
         mock_imperative_shm_teardown_then_exit,  # noqa: ARG002
         mock_shm_config_from_remote,  # noqa: ARG002
     ):
+        mocker.patch.object(Confirm, "ask", return_value="yes")
         result = runner.invoke(shm_command_group, ["teardown"])
         assert result.exit_code == 1
         assert "mock teardown" in result.stdout
