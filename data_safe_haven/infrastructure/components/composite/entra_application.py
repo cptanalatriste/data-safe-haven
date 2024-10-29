@@ -135,24 +135,29 @@ class EntraApplicationComponent(ComponentResource):
         )
 
         # Grant admin approval for requested application permissions
-        for permission_type, permission in props.application_permissions:
-            if permission_type == EntraAppPermissionType.APPLICATION:
-                entra.AppRoleAssignment(
-                    replace_separators(
-                        f"{self._name}_application_role_grant_{permission_type.value}_{permission}",
-                        "_",
-                    ).lower(),
-                    app_role_id=props.msgraph_permissions[permission_type][permission],
-                    principal_object_id=self.application_service_principal.object_id,
-                    resource_object_id=props.msgraph_object_id,
-                )
-            if permission_type == EntraAppPermissionType.DELEGATED:
-                entra.ServicePrincipalDelegatedPermissionGrant(
-                    replace_separators(
-                        f"{self._name}_application_delegated_grant_{permission_type.value}_{permission}",
-                        "_",
-                    ).lower(),
-                    claim_values=[permission],
-                    resource_service_principal_object_id=props.msgraph_object_id,
-                    service_principal_object_id=self.application_service_principal.object_id,
-                )
+        [
+            entra.AppRoleAssignment(
+                replace_separators(
+                    f"{self._name}_application_role_grant_{permission_type.value}_{permission}",
+                    "_",
+                ).lower(),
+                app_role_id=props.msgraph_permissions[permission_type][permission],
+                principal_object_id=self.application_service_principal.object_id,
+                resource_object_id=props.msgraph_object_id,
+            )
+            for permission_type, permission in props.application_permissions
+            if permission_type == EntraAppPermissionType.APPLICATION
+        ]
+        [
+            entra.ServicePrincipalDelegatedPermissionGrant(
+                replace_separators(
+                    f"{self._name}_application_delegated_grant_{permission_type.value}_{permission}",
+                    "_",
+                ).lower(),
+                claim_values=[permission],
+                resource_service_principal_object_id=props.msgraph_object_id,
+                service_principal_object_id=self.application_service_principal.object_id,
+            )
+            for permission_type, permission in props.application_permissions
+            if permission_type == EntraAppPermissionType.DELEGATED
+        ]
