@@ -1,6 +1,5 @@
 from pytest import CaptureFixture, LogCaptureFixture
 from pytest_mock import MockerFixture
-from rich.prompt import Confirm
 from typer.testing import CliRunner
 
 from data_safe_haven.commands.sre import sre_command_group
