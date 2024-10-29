@@ -146,7 +146,7 @@ def teardown() -> None:
             "Tearing down the Safe Haven Management environment will permanently delete all associated resources, including remotely stored configurations."
         )
         if not console.confirm(
-            "Do you wish to continue tearing down the SHM?", default_to_yes=True
+            "Do you wish to continue tearing down the SHM?", default_to_yes=False
         ):
             console.print("SHM teardown cancelled by user.")
             raise typer.Exit(0)
