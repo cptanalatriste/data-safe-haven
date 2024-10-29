@@ -40,7 +40,6 @@ class TestDeploySHM:
 class TestTeardownSHM:
     def test_teardown(
         self,
-        mocker,
         runner,
         mock_imperative_shm_teardown_then_exit,  # noqa: ARG002
         mock_shm_config_from_remote,  # noqa: ARG002
