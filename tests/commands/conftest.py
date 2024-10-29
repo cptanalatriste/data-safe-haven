@@ -96,6 +96,15 @@ def mock_pulumi_config_from_remote(mocker, pulumi_config):
 
 
 @fixture
+def mock_pulumi_config_from_remote_fails(mocker):
+    mocker.patch.object(
+        DSHPulumiConfig,
+        "from_remote",
+        return_value=DataSafeHavenAzureError("mock from_remote failure"),
+    )
+
+
+@fixture
 def mock_pulumi_config_from_remote_or_create(mocker, pulumi_config_empty):
     mocker.patch.object(
         DSHPulumiConfig, "from_remote_or_create", return_value=pulumi_config_empty
