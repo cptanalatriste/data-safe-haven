@@ -148,7 +148,7 @@ def teardown() -> None:
         if not console.confirm(
             "Do you wish to continue tearing down the SHM?", default_to_yes=True
         ):
-            logger.info("SHM teardown cancelled by user.")
+            console.print("SHM teardown cancelled by user.")
             raise typer.Exit(0)
         shm_infra.teardown()
     except DataSafeHavenError as exc:

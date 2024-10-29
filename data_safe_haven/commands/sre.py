@@ -199,7 +199,7 @@ def teardown(
         if not console.confirm(
             "Do you wish to continue tearing down the SRE?", default_to_yes=True
         ):
-            logger.info("SRE teardown cancelled by user.")
+            console.print("SRE teardown cancelled by user.")
             raise typer.Exit(0)
 
         # Check whether current IP address is authorised to take administrator actions
