@@ -76,6 +76,7 @@ class TestTeardownSHM:
         runner,
         mock_azuresdk_get_subscription_name,  # noqa: ARG002
         mock_pulumi_config_from_remote,  # noqa: ARG002
+        mock_pulumi_config_remote_exists,  # noqa: ARG002
         mock_shm_config_from_remote,  # noqa: ARG002
         mock_shm_config_remote_exists,  # noqa: ARG002
     ):
