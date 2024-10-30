@@ -43,6 +43,7 @@ class TestTeardownSHM:
         runner,
         mock_imperative_shm_teardown_then_exit,  # noqa: ARG002
         mock_shm_config_from_remote,  # noqa: ARG002
+        mock_shm_config_remote_exists,  # noqa: ARG002
     ):
         result = runner.invoke(shm_command_group, ["teardown"], input="y")
         assert result.exit_code == 1
@@ -62,6 +63,7 @@ class TestTeardownSHM:
         self,
         runner,
         mock_azuresdk_get_credential_failure,  # noqa: ARG002
+        mock_shm_config_remote_exists,  # noqa: ARG002
     ):
         result = runner.invoke(shm_command_group, ["teardown"])
         assert result.exit_code == 1
@@ -75,6 +77,7 @@ class TestTeardownSHM:
         mock_azuresdk_get_subscription_name,  # noqa: ARG002
         mock_pulumi_config_from_remote,  # noqa: ARG002
         mock_shm_config_from_remote,  # noqa: ARG002
+        mock_shm_config_remote_exists,  # noqa: ARG002
     ):
         result = runner.invoke(shm_command_group, ["teardown"], input="y")
         assert result.exit_code == 1
@@ -86,6 +89,7 @@ class TestTeardownSHM:
         mock_azuresdk_get_subscription_name,  # noqa: ARG002
         mock_pulumi_config_from_remote,  # noqa: ARG002
         mock_shm_config_from_remote,  # noqa: ARG002
+        mock_shm_config_remote_exists,  # noqa: ARG002
     ):
         result = runner.invoke(shm_command_group, ["teardown"], input="n")
         assert result.exit_code == 0
@@ -98,6 +102,7 @@ class TestTeardownSHM:
         mock_pulumi_config_from_remote_fails,  # noqa: ARG002
         mock_shm_config_from_remote,  # noqa: ARG002
         mock_imperative_shm_teardown_then_exit,  # noqa: ARG002
+        mock_shm_config_remote_exists,  # noqa: ARG002
     ):
         result = runner.invoke(shm_command_group, ["teardown"], input="y")
         assert result.exit_code == 1
