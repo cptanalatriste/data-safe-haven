@@ -103,11 +103,10 @@ class TestTeardownSRE:
         runner: CliRunner,
         mock_ip_1_2_3_4,  # noqa: ARG002
         mock_pulumi_config_from_remote,  # noqa: ARG002
-        mock_shm_config_from_remote,  # noqa: ARG002
         mock_sre_config_from_remote,  # noqa: ARG002
         mock_sre_project_manager_teardown_then_exit,  # noqa: ARG002
     ) -> None:
-        result = runner.invoke(sre_command_group, ["teardown", "sandbox"])
+        result = runner.invoke(sre_command_group, ["teardown", "sandbox"], input="y")
         assert result.exit_code == 1
         assert "mock teardown" in result.stdout
 
@@ -138,3 +137,15 @@ class TestTeardownSRE:
         assert result.exit_code == 1
         assert "mock get_credential\n" in result.stdout
         assert "mock get_credential error" in result.stdout
+
+    def test_teardown_cancelled(
+        self,
+        runner: CliRunner,
+        mock_ip_1_2_3_4,  # noqa: ARG002
+        mock_pulumi_config_from_remote,  # noqa: ARG002
+        mock_sre_config_from_remote,  # noqa: ARG002
+        mock_sre_project_manager_teardown_then_exit,  # noqa: ARG002
+    ) -> None:
+        result = runner.invoke(sre_command_group, ["teardown", "sandbox"], input="n")
+        assert result.exit_code == 0
+        assert "cancelled by user" in result.stdout

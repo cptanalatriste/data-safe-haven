@@ -1,4 +1,4 @@
-from data_safe_haven.config import Context, SHMConfig
+from data_safe_haven.config import Context, DSHPulumiConfig, SHMConfig
 from data_safe_haven.exceptions import (
     DataSafeHavenAzureError,
     DataSafeHavenMicrosoftGraphError,
@@ -178,6 +178,13 @@ class ImperativeSHM:
             DataSafeHavenAzureError if any resources cannot be destroyed
         """
         logger = get_logger()
+        if DSHPulumiConfig.remote_exists(self.context):
+            pulumi_config = DSHPulumiConfig.from_remote(self.context)
+            deployed = pulumi_config.project_names
+            if deployed:
+                logger.info(f"Found deployed SREs: {deployed}.")
+                msg = "Deployed SREs must be torn down before the SHM can be torn down."
+                raise DataSafeHavenAzureError(msg)
         try:
             logger.info(
                 f"Removing [green]{self.context.description}[/] resource group {self.context.resource_group_name}."

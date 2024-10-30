@@ -4,6 +4,7 @@ from typing import Annotated
 
 import typer
 
+from data_safe_haven import console
 from data_safe_haven.config import ContextManager, DSHPulumiConfig, SHMConfig, SREConfig
 from data_safe_haven.exceptions import DataSafeHavenConfigError, DataSafeHavenError
 from data_safe_haven.external import AzureSdk, GraphApi
@@ -189,6 +190,17 @@ def teardown(
         # Load Pulumi and SRE configs
         pulumi_config = DSHPulumiConfig.from_remote(context)
         sre_config = SREConfig.from_remote_by_name(context, name)
+
+        console.print(
+            "Tearing down the Secure Research Environment will permanently delete all associated resources, "
+            "including all data stored in the environment.\n"
+            "Ensure that any desired outputs have been extracted before continuing."
+        )
+        if not console.confirm(
+            "Do you wish to continue tearing down the SRE?", default_to_yes=False
+        ):
+            console.print("SRE teardown cancelled by user.")
+            raise typer.Exit(0)
 
         # Check whether current IP address is authorised to take administrator actions
         if not ip_address_in_list(sre_config.sre.admin_ip_addresses):
