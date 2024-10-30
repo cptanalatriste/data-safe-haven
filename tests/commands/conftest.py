@@ -122,9 +122,11 @@ def mock_pulumi_config_no_key_from_remote(mocker, pulumi_config_no_key):
 def mock_pulumi_config_upload(mocker):
     mocker.patch.object(DSHPulumiConfig, "upload", return_value=None)
 
+
 @fixture
 def mock_pulumi_config_remote_exists(mocker):
     mocker.patch.object(DSHPulumiConfig, "remote_exists", return_value=True)
+
 
 @fixture
 def mock_shm_config_from_remote(mocker, shm_config):
