@@ -153,9 +153,7 @@ def teardown() -> None:
                 raise typer.Exit(0)
             shm_infra.teardown()
         else:
-            logger.critical(
-                f"No deployed SHM found for context [green]{context.name}."
-            )
+            logger.critical(f"No deployed SHM found for context [green]{context.name}.")
             raise typer.Exit(1)
     except DataSafeHavenError as exc:
         logger.critical("Could not teardown Safe Haven Management environment.")
