@@ -34,10 +34,10 @@ class WrappedNFSV3StorageAccount(storage.StorageAccount):
         tags: Input[Mapping[str, Input[str]]],
     ):
         if allowed_service_tag == AzureServiceTag.INTERNET:
-            public_network_access = storage.PublicNetworkAccess.ENABLED
+            default_action = storage.DefaultAction.ALLOW,
             ip_rules = None
         else:
-            public_network_access = storage.PublicNetworkAccess.DISABLED
+            default_action = storage.DefaultAction.DENY,
             ip_rules = Output.from_input(allowed_ip_addresses).apply(
                 lambda ip_ranges: [
                     storage.IPRuleArgs(
@@ -63,7 +63,7 @@ class WrappedNFSV3StorageAccount(storage.StorageAccount):
             minimum_tls_version=storage.MinimumTlsVersion.TLS1_2,
             network_rule_set=storage.NetworkRuleSetArgs(
                 bypass=storage.Bypass.AZURE_SERVICES,
-                default_action=storage.DefaultAction.DENY,
+                default_action=default_action,
                 ip_rules=ip_rules,
                 virtual_network_rules=[
                     storage.VirtualNetworkRuleArgs(
@@ -71,7 +71,7 @@ class WrappedNFSV3StorageAccount(storage.StorageAccount):
                     )
                 ],
             ),
-            public_network_access=public_network_access,
+            public_network_access=storage.PublicNetworkAccess.ENABLED,
             resource_group_name=resource_group_name,
             sku=storage.SkuArgs(name=storage.SkuName.PREMIUM_ZRS),
             opts=opts,
