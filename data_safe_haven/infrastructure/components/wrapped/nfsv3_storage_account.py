@@ -26,7 +26,7 @@ class WrappedNFSV3StorageAccount(storage.StorageAccount):
         *,
         account_name: Input[str],
         allowed_ip_addresses: Input[Sequence[str]] | None,
-        allowed_service_tag: Input[Sequence[str]] | None,
+        allowed_service_tag: AzureServiceTag | None,
         location: Input[str],
         resource_group_name: Input[str],
         subnet_id: Input[str],
@@ -34,10 +34,10 @@ class WrappedNFSV3StorageAccount(storage.StorageAccount):
         tags: Input[Mapping[str, Input[str]]],
     ):
         if allowed_service_tag == AzureServiceTag.INTERNET:
-            default_action = storage.DefaultAction.ALLOW,
-            ip_rules = None
+            default_action = storage.DefaultAction.ALLOW
+            ip_rules = []
         else:
-            default_action = storage.DefaultAction.DENY,
+            default_action = storage.DefaultAction.DENY
             ip_rules = Output.from_input(allowed_ip_addresses).apply(
                 lambda ip_ranges: [
                     storage.IPRuleArgs(
