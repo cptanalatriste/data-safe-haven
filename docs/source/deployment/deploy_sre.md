@@ -186,7 +186,7 @@ The ability to copy and paste text to or from SRE workspaces via the Guacamole c
 `allow_paste` allows users to paste text into an SRE workspace from the Guacamole clipboard.
 These options have no impact on the ability to use copy and paste within a workspace.
 
-The impact of setting each of these options is detailed in the below table.
+The impact of setting each of these options is detailed in the following table.
 
 <table class="table" id="id1">
     <caption><span class="caption-text">Configuration of copy and paste</span><a class="headerlink" href="#id1" title="Link to this table">#</a></caption>
