@@ -187,68 +187,58 @@ The ability to copy and paste text to or from SRE workspaces via the Guacamole c
 These options have no impact on the ability to use copy and paste within a workspace.
 
 The impact of setting each of these options is detailed in the below table.
-<html>
-  <style>
-    table, th, tr, td {
-      padding: 10px
-    }
-  </style>
-  <table>
-    <caption><strong>Configuration of copy and paste</strong><a class="headerlink" href="#copy-and-paste-table" title="Link to this table">#</a></caption>
+
+<table class="table" id="id1">
+    <caption><span class="caption-text">Configuration of copy and paste</span><a class="headerlink" href="#id1" title="Link to this table">#</a></caption>
     <thead>
-      <tr style = "background-color: #EEEEEE; text-align:center">
-        <th colspan = "2" style="border-right: 1px solid">Configuration setting</th>
-        <th colspan = "4">Resulting behaviour</th>
+      <tr class="row-odd" style="border-bottom:hidden">
+        <th class="head" colspan = "2" style="text-align:center">Configuration setting</th>
+        <th class="head" colspan = "4" style="text-align:center">Resulting behaviour</th>
       </tr>
-    </thead>
-    <thead>
-      <tr style = "border-bottom: 1px solid; background-color: #EEEEEE">
-        <th>allow_copy</th>
-        <th style = "border-right: 1px solid">allow_paste</th>
-        <th>Copy/paste within workspace</th>
-        <th>Copy/paste between workspaces</th>
-        <th>Copy to local machine</th>
-        <th>Paste from local machine</th>
+      <tr class="row-odd">
+        <th class="head"><tt>allow_copy</tt></th>
+        <th class="head"><tt>allow_paste</tt></th>
+        <th class="head">Copy/paste within workspace</th>
+        <th class="head">Copy/paste between workspaces</th>
+        <th class="head">Copy to local machine</th>
+        <th class="head">Paste from local machine</th>
       </tr>
     </thead>
     <tbody>
-      <tr style = "background-color: #EEEEEE">
+      <tr class="row-even">
         <td>true</td>
-        <td style = "border-right: 1px solid">true</td>
+        <td>true</td>
         <td>yes</td>
         <td>yes</td>
         <td>yes</td>
         <td>yes</td>
       </tr>
-      <tr>
+      <tr class="row-odd">
         <td>true</td>
-        <td style = "border-right: 1px solid">false</td>
-        <td>yes</td>
-        <td>no</td>
-        <td>yes</td>
-        <td>no</td>
-      </tr>
-      <tr style = "background-color: #EEEEEE">
         <td>false</td>
-        <td style = "border-right: 1px solid">true</td>
         <td>yes</td>
         <td>no</td>
-        <td>no</td>
         <td>yes</td>
+        <td>no</td>
       </tr>
       <tr>
         <td>false</td>
-        <td style = "border-right: 1px solid">false</td>
+        <td>true</td>
+        <td>yes</td>
+        <td>no</td>
+        <td>no</td>
+        <td>yes</td>
+      </tr>
+      <tr>
+        <td>false</td>
+        <td>false</td>
         <td>yes</td>
         <td>no</td>
         <td>no</td>
         <td>no</td>
       </tr>
     </tbody>
-  </table>
-</html>
-
-:::
+</table>
 
 ## Upload the configuration file
 
