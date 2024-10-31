@@ -209,7 +209,7 @@ The impact of setting each of these options is detailed in the following table.
         <td>true</td>
         <td>true</td>
         <td>yes</td>
-        <td>yes</td>
+        <td>yes (via local machine)</td>
         <td>yes</td>
         <td>yes</td>
       </tr>
