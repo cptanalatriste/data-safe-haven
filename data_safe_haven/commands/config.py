@@ -6,7 +6,7 @@ from typing import Annotated, Optional
 
 import typer
 
-from data_safe_haven import console
+from data_safe_haven import console, validators
 from data_safe_haven.config import (
     ContextManager,
     DSHPulumiConfig,
@@ -107,7 +107,8 @@ def available() -> None:
 
 @config_command_group.command()
 def show(
-    name: Annotated[str, typer.Argument(help="Name of SRE to show")],
+    name: Annotated[str, typer.Argument(help="Name of SRE to show",
+                                        callback=validators.typer_safe_string)],
     file: Annotated[
         Optional[Path],  # noqa: UP007
         typer.Option(help="File path to write configuration template to."),
@@ -200,6 +201,7 @@ def upload(
         logger.error("Check for missing or incorrect fields in the configuration.")
         raise typer.Exit(1) from exc
 
+    print(config.filename)
     # Present diff to user
     if (not force) and SREConfig.remote_exists(context, filename=config.filename):
         try:
