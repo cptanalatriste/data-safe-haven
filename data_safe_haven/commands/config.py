@@ -110,7 +110,7 @@ def show(
     name: Annotated[
         str,
         typer.Argument(
-            help="Name of SRE to show", callback=validators.typer_safe_string
+            help="Name of SRE to show"
         ),
     ],
     file: Annotated[
