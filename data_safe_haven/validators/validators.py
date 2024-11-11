@@ -135,6 +135,13 @@ def safe_string(safe_string: str) -> str:
     return safe_string
 
 
+def safe_sre_name(safe_sre_name: str) -> str:
+    if not re.match(r"^[a-zA-Z0-9_-]*$", safe_sre_name) or not safe_sre_name:
+        msg = "Expected valid string containing only lowercase letters, numbers, hyphens and underscores."
+        raise ValueError(msg)
+    return safe_sre_name
+
+
 def timezone(timezone: str) -> str:
     if timezone not in pytz.all_timezones:
         msg = "Expected valid timezone, for example 'Europe/London'."
