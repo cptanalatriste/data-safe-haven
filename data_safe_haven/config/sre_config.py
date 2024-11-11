@@ -17,8 +17,8 @@ from .config_sections import (
 
 
 def sre_config_name(sre_name: str) -> str:
-    """Construct a safe YAML filename given an input SRE name."""
-    return f"sre-{sre_name}.yaml"
+    """Construct a YAML filename given an input SRE name."""
+    return f"sre-{sre_name.lower()}.yaml"
 
 
 class SREConfig(AzureSerialisableModel):
