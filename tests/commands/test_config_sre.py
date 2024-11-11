@@ -167,7 +167,7 @@ class TestUploadSRE:
     def test_upload_new(
         self, mocker, context, runner, sre_config_yaml, sre_config_file
     ):
-        sre_name = "SandBox"
+        sre_name = "sandbox"
         sre_filename = sre_config_name(sre_name)
         mock_exists = mocker.patch.object(
             SREConfig, "remote_exists", return_value=False
@@ -191,7 +191,7 @@ class TestUploadSRE:
     def test_upload_no_changes(
         self, mocker, context, runner, sre_config, sre_config_file
     ):
-        sre_name = "SandBox"
+        sre_name = "sandbox"
         sre_filename = sre_config_name(sre_name)
         mock_exists = mocker.patch.object(SREConfig, "remote_exists", return_value=True)
         mock_from_remote = mocker.patch.object(
@@ -247,9 +247,9 @@ class TestUploadSRE:
         assert "+++ local" in result.stdout
 
     def test_upload_changes_n(
-        self, mocker, context, runner, sre_config_alternate, sre_config_file
+        self, mocker, context, runner, sre_config, sre_config_alternate, sre_config_file
     ):
-        sre_name = "SandBox"
+        sre_name = "sandbox"
         sre_filename = sre_config_name(sre_name)
         mock_exists = mocker.patch.object(SREConfig, "remote_exists", return_value=True)
         mock_from_remote = mocker.patch.object(
@@ -285,9 +285,9 @@ class TestUploadSRE:
         assert "Configuration file 'fake_config.yaml' not found." in result.stdout
 
     def test_upload_invalid_config(
-        self, mocker, runner, context, sre_config_file, sre_config_yaml
+        self, mocker, runner, context, sre_config, sre_config_file, sre_config_yaml
     ):
-        sre_name = "SandBox"
+        sre_name = "sandbox"
         sre_filename = sre_config_name(sre_name)
 
         mock_exists = mocker.patch.object(SREConfig, "remote_exists", return_value=True)
@@ -310,7 +310,7 @@ class TestUploadSRE:
     def test_upload_invalid_config_force(
         self, mocker, runner, context, sre_config_file, sre_config_yaml
     ):
-        sre_name = "SandBox"
+        sre_name = "sandbox"
         sre_filename = sre_config_name(sre_name)
 
         mocker.patch.object(
