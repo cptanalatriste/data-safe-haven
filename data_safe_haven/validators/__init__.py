@@ -1,5 +1,4 @@
 from .typer import (
-    type_safe_sre_name,
     typer_aad_guid,
     typer_azure_subscription_name,
     typer_azure_vm_sku,
@@ -45,6 +44,7 @@ __all__ = [
     "typer_entra_group_name",
     "typer_fqdn",
     "typer_ip_address",
+    "typer_safe_sre_name",
     "typer_safe_string",
     "typer_timezone",
     "unique_list",

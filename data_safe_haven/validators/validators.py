@@ -136,7 +136,7 @@ def safe_string(safe_string: str) -> str:
 
 
 def safe_sre_name(safe_sre_name: str) -> str:
-    if not re.match(r"^[a-zA-Z0-9_-]*$", safe_sre_name) or not safe_sre_name:
+    if not re.match(r"^[a-z0-9_-]*$", safe_sre_name) or not safe_sre_name:
         msg = "Expected valid string containing only lowercase letters, numbers, hyphens and underscores."
         raise ValueError(msg)
     return safe_sre_name
