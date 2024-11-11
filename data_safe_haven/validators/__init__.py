@@ -1,4 +1,5 @@
 from .typer import (
+    type_safe_sre_name,
     typer_aad_guid,
     typer_azure_subscription_name,
     typer_azure_vm_sku,
@@ -6,6 +7,7 @@ from .typer import (
     typer_entra_group_name,
     typer_fqdn,
     typer_ip_address,
+    typer_safe_sre_name,
     typer_safe_string,
     typer_timezone,
 )
@@ -18,6 +20,7 @@ from .validators import (
     entra_group_name,
     fqdn,
     ip_address,
+    safe_sre_name,
     safe_string,
     timezone,
     unique_list,
@@ -32,6 +35,7 @@ __all__ = [
     "entra_group_name",
     "fqdn",
     "ip_address",
+    "safe_sre_name",
     "safe_string",
     "timezone",
     "typer_aad_guid",
