@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import ClassVar, Self
 
 from data_safe_haven.serialisers import AzureSerialisableModel, ContextBase
-from data_safe_haven.types import SafeString, SoftwarePackageCategory
+from data_safe_haven.types import SafeSreName, SoftwarePackageCategory
 
 from .config_sections import (
     ConfigSectionAzure,
@@ -18,7 +18,7 @@ from .config_sections import (
 
 def sre_config_name(sre_name: str) -> str:
     """Construct a YAML filename given an input SRE name."""
-    return f"sre-{sre_name.lower()}.yaml"
+    return f"sre-{sre_name}.yaml"
 
 
 class SREConfig(AzureSerialisableModel):
@@ -30,7 +30,7 @@ class SREConfig(AzureSerialisableModel):
     azure: ConfigSectionAzure
     description: str
     dockerhub: ConfigSectionDockerHub
-    name: SafeString
+    name: SafeSreName
     sre: ConfigSectionSRE
 
     @property
