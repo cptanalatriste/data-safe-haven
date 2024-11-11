@@ -6,7 +6,7 @@ from typing import Annotated, Optional
 
 import typer
 
-from data_safe_haven import console, validators
+from data_safe_haven import console
 from data_safe_haven.config import (
     ContextManager,
     DSHPulumiConfig,
@@ -109,9 +109,7 @@ def available() -> None:
 def show(
     name: Annotated[
         str,
-        typer.Argument(
-            help="Name of SRE to show"
-        ),
+        typer.Argument(help="Name of SRE to show"),
     ],
     file: Annotated[
         Optional[Path],  # noqa: UP007

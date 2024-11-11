@@ -247,7 +247,7 @@ class TestUploadSRE:
         assert "+++ local" in result.stdout
 
     def test_upload_changes_n(
-        self, mocker, context, runner, sre_config, sre_config_alternate, sre_config_file
+        self, mocker, context, runner, sre_config_alternate, sre_config_file
     ):
         sre_name = "sandbox"
         sre_filename = sre_config_name(sre_name)
@@ -285,7 +285,7 @@ class TestUploadSRE:
         assert "Configuration file 'fake_config.yaml' not found." in result.stdout
 
     def test_upload_invalid_config(
-        self, mocker, runner, context, sre_config, sre_config_file, sre_config_yaml
+        self, mocker, runner, context, sre_config_file, sre_config_yaml
     ):
         sre_name = "sandbox"
         sre_filename = sre_config_name(sre_name)
