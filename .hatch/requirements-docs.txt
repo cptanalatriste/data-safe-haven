@@ -50,7 +50,7 @@ mdurl==0.1.2
     # via markdown-it-py
 myst-parser==4.0.0
     # via hatch.envs.docs
-packaging==24.1
+packaging==24.2
     # via sphinx
 pydata-sphinx-theme==0.16.0
     # via hatch.envs.docs
@@ -91,7 +91,7 @@ typing-extensions==4.12.2
     # via pydata-sphinx-theme
 urllib3==2.2.3
     # via requests
-wheel==0.44.0
+wheel==0.45.0
     # via sphinx-togglebutton
 
 # The following packages are considered to be unsafe in a requirements file:
