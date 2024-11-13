@@ -6,6 +6,7 @@ from datetime import UTC, datetime
 from typing import Any, ClassVar
 
 import jwt
+import typer
 from azure.core.credentials import AccessToken, TokenCredential
 from azure.core.exceptions import ClientAuthenticationError
 from azure.identity import (
@@ -144,8 +145,7 @@ class AzureSdkCredential(DeferredCredential):
             self.logger.error(
                 "Please authenticate with Azure: run '[green]az login[/]' using [bold]infrastructure administrator[/] credentials."
             )
-            msg = "Error getting account information from Azure CLI."
-            raise DataSafeHavenAzureError(msg) from exc
+            raise typer.Exit(code=1) from exc
         return credential
 
 
@@ -214,13 +214,18 @@ class GraphApiCredential(DeferredCredential):
             raise DataSafeHavenAzureError(msg) from exc
 
         # Confirm that these are the desired credentials
-        self.confirm_credentials_interactive(
-            "Microsoft Graph API",
-            user_name=new_auth_record.username,
-            user_id=new_auth_record._home_account_id.split(".")[0],
-            tenant_name=new_auth_record._username.split("@")[1],
-            tenant_id=new_auth_record._tenant_id,
-        )
-
+        try:
+            self.confirm_credentials_interactive(
+                "Microsoft Graph API",
+                user_name=new_auth_record.username,
+                user_id=new_auth_record._home_account_id.split(".")[0],
+                tenant_name=new_auth_record._username.split("@")[1],
+                tenant_id=new_auth_record._tenant_id,
+            )
+        except (CredentialUnavailableError, DataSafeHavenValueError) as exc:
+            self.logger.error(
+                "Please authenticate with Graph API using [bold]global administrator credentials[/] for your [blue]Entra ID directory[/]."
+            )
+            raise typer.Exit(code=1) from exc
         # Return the credential
         return credential
