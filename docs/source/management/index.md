@@ -141,6 +141,50 @@ Tearing down the SHM also renders the SREs inaccessible to users and prevents th
 All SREs associated with the SHM should be torn down before the SHM is torn down.
 ::::
 
+### Updating SRE configurations
+
+Changes to SRE configurations are made by first editing the relevant configuration file for the SRE, uploading the new configuration, and then redeploying the SRE.
+
+- The existing configuration for the SRE can be shown using the following:
+
+```{code} shell
+$ dsh config show YOUR_SRE_NAME
+```
+
+- If you do not have a local copy of the configuration for the SRE, it can be downloaded by adding the `file` argument:
+
+```{code} shell
+$ dsh config show YOUR_SRE_NAME --file YOUR_SRE_NAME.yaml
+```
+
+- Edit the configuration file locally, and upload the new version:
+
+```{code} shell
+$ dsh config upload YOUR_SRE_NAME.yaml
+```
+
+- You will be shown the differences between the existing configuration and the new configuration and asked to confirm that they are correct.
+
+- Finally, redeploy your SRE for the infrastructure to reflect your new changes
+
+```{code} shell
+$ dsh sre deploy YOUR_SRE_NAME
+```
+
+::::{admonition} Changing allowed administrator IP addresses
+:class: warning
+If you are changing the IP addresses from which administrators are allowed to make changes to the infrastructure, you **must** redeploy the SRE from the **original** IP address.
+You will not be able to complete redeployment from the new IP address, because you will not be able to modify the IP addresses that are allowed to access the storage accounts.
+
+- Add the new IP address to the configuration, but do not delete the original IP address.
+- Upload the new configuration and redeploy the SRE from the original IP address, as above
+
+If you then wish to remove the original IP address from the list of allowed IP addresses, then
+
+- Remove the old IP address from the configuration
+- Upload the new configuration and redeploy the SRE from the new IP address
+::::
+
 ## Managing data ingress and egress
 
 ### Data Ingress
