@@ -183,6 +183,7 @@ If you then wish to remove the original IP address from the list of allowed IP a
 
 - Remove the old IP address from the configuration
 - Upload the new configuration and redeploy the SRE from the new IP address
+
 ::::
 
 ## Managing data ingress and egress
