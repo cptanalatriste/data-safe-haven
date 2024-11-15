@@ -173,17 +173,10 @@ $ dsh sre deploy YOUR_SRE_NAME
 
 ::::{admonition} Changing administrator IP addresses
 :class: warning
-If you are changing the IP addresses from which administrators are allowed to make changes to the infrastructure, you **must** redeploy the SRE from the **original** IP address.
-You will not be able to complete redeployment from the new IP address, because you will not be able to modify the IP addresses that are allowed to access the storage accounts.
+The administrator IP addresses declared in the SRE configuration are used to create access rules for SRE infrastructure.
+Therefore, after an SRE has been deployed, some changes can only be made from IP addresses on that list.
 
-- Add the new IP address to the configuration, but do not delete the original IP address.
-- Upload the new configuration and redeploy the SRE from the original IP address, as above
-
-If you then wish to remove the original IP address from the list of allowed IP addresses, then
-
-- Remove the old IP address from the configuration
-- Upload the new configuration and redeploy the SRE from the new IP address
-
+As a consequence, if you want to update the list of administrator IP addresses, for example to add a new administrator, you must do so from an IP address that is already allowed.
 ::::
 
 ## Managing data ingress and egress
