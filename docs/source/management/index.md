@@ -151,7 +151,7 @@ Changes to SRE configurations are made by first editing the relevant configurati
 $ dsh config show YOUR_SRE_NAME
 ```
 
-- If you do not have a local copy of the configuration for the SRE, it can be downloaded by adding the `file` argument:
+- If you do not have a local copy, you can write one with the `--file` option:
 
 ```{code} shell
 $ dsh config show YOUR_SRE_NAME --file YOUR_SRE_NAME.yaml
