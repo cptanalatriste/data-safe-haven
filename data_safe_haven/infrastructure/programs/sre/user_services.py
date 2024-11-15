@@ -156,6 +156,7 @@ class SREUserServicesComponent(ComponentResource):
                 dns_server_ip=props.dns_server_ip,
                 dockerhub_credentials=props.dockerhub_credentials,
                 location=props.location,
+                log_analytics_workspace=props.log_analytics_workspace,
                 nexus_admin_password=props.nexus_admin_password,
                 resource_group_name=props.resource_group_name,
                 sre_fqdn=props.sre_fqdn,
