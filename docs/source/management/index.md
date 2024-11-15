@@ -171,7 +171,7 @@ $ dsh config upload YOUR_SRE_NAME.yaml
 $ dsh sre deploy YOUR_SRE_NAME
 ```
 
-::::{admonition} Changing allowed administrator IP addresses
+::::{admonition} Changing administrator IP addresses
 :class: warning
 If you are changing the IP addresses from which administrators are allowed to make changes to the infrastructure, you **must** redeploy the SRE from the **original** IP address.
 You will not be able to complete redeployment from the new IP address, because you will not be able to modify the IP addresses that are allowed to access the storage accounts.
