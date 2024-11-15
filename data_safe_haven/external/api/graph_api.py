@@ -13,6 +13,7 @@ from dns import resolver
 
 from data_safe_haven import console
 from data_safe_haven.exceptions import (
+    DataSafeHavenAzureError,
     DataSafeHavenMicrosoftGraphError,
     DataSafeHavenValueError,
 )
@@ -837,7 +838,7 @@ class GraphApi:
                     "value"
                 ]
             ]
-        except (DataSafeHavenMicrosoftGraphError, requests.JSONDecodeError) as exc:
+        except (DataSafeHavenAzureError, DataSafeHavenMicrosoftGraphError, requests.JSONDecodeError) as exc:
             msg = "Could not load list of applications."
             raise DataSafeHavenMicrosoftGraphError(msg) from exc
 
