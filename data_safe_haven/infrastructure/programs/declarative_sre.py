@@ -308,6 +308,20 @@ class DeclarativeSRE:
             tags=self.tags,
         )
 
+        # Deploy monitoring
+        monitoring = SREMonitoringComponent(
+            "sre_monitoring",
+            self.stack_name,
+            SREMonitoringProps(
+                dns_private_zones=dns.private_zones,
+                location=self.config.azure.location,
+                resource_group_name=resource_group.name,
+                subnet=networking.subnet_monitoring,
+                timezone=self.config.sre.timezone,
+            ),
+            tags=self.tags,
+        )
+
         # Deploy containerised user services
         user_services = SREUserServicesComponent(
             "sre_user_services",
@@ -325,6 +339,7 @@ class DeclarativeSRE:
                 ldap_username_attribute=ldap_username_attribute,
                 ldap_user_search_base=ldap_user_search_base,
                 location=self.config.azure.location,
+                log_analytics_workspace=monitoring.log_analytics,
                 nexus_admin_password=data.password_nexus_admin,
                 resource_group_name=resource_group.name,
                 software_packages=self.config.sre.software_packages,
@@ -335,20 +350,6 @@ class DeclarativeSRE:
                 subnet_containers_support=networking.subnet_user_services_containers_support,
                 subnet_databases=networking.subnet_user_services_databases,
                 subnet_software_repositories=networking.subnet_user_services_software_repositories,
-            ),
-            tags=self.tags,
-        )
-
-        # Deploy monitoring
-        monitoring = SREMonitoringComponent(
-            "sre_monitoring",
-            self.stack_name,
-            SREMonitoringProps(
-                dns_private_zones=dns.private_zones,
-                location=self.config.azure.location,
-                resource_group_name=resource_group.name,
-                subnet=networking.subnet_monitoring,
-                timezone=self.config.sre.timezone,
             ),
             tags=self.tags,
         )
