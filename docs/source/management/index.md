@@ -143,7 +143,7 @@ All SREs associated with the SHM should be torn down before the SHM is torn down
 
 ### Updating SREs
 
-Changes to SRE configurations are made by first editing the relevant configuration file for the SRE, uploading the new configuration, and then redeploying the SRE.
+SREs are modified by updating the configuration then running the deploy command.
 
 - The existing configuration for the SRE can be shown using the following:
 
