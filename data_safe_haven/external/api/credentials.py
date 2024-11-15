@@ -225,7 +225,7 @@ class GraphApiCredential(DeferredCredential):
         except (CredentialUnavailableError, DataSafeHavenValueError) as exc:
             self.logger.error(
                 f"Delete the cached credential file [green]{authentication_record_path}[/] and\n"
-                "authenticate with Graph API using [bold]global administrator credentials[/] for your [blue]Entra ID directory[/].\n"
+                "authenticate with Graph API using [bold]global administrator credentials[/] for your [blue]Entra ID directory[/]."
 
             )
             raise typer.Exit(code=1) from exc
