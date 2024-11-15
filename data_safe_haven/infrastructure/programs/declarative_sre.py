@@ -420,4 +420,5 @@ class DeclarativeSRE:
         pulumi.export("data", data.exports)
         pulumi.export("ldap", ldap_group_names)
         pulumi.export("remote_desktop", remote_desktop.exports)
+        pulumi.export("sre_fqdn", networking.sre_fqdn)
         pulumi.export("workspaces", workspaces.exports)
