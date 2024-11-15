@@ -838,7 +838,11 @@ class GraphApi:
                     "value"
                 ]
             ]
-        except (DataSafeHavenAzureError, DataSafeHavenMicrosoftGraphError, requests.JSONDecodeError) as exc:
+        except (
+            DataSafeHavenAzureError,
+            DataSafeHavenMicrosoftGraphError,
+            requests.JSONDecodeError,
+        ) as exc:
             msg = "Could not load list of applications."
             raise DataSafeHavenMicrosoftGraphError(msg) from exc
 
