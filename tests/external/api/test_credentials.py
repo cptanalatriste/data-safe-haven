@@ -4,8 +4,8 @@ from azure.identity import (
     DeviceCodeCredential,
 )
 
+from click.exceptions import Exit
 from data_safe_haven.directories import config_dir
-from data_safe_haven.exceptions import DataSafeHavenAzureError
 from data_safe_haven.external.api.credentials import (
     AzureSdkCredential,
     DeferredCredential,
@@ -37,8 +37,7 @@ class TestDeferredCredential:
         DeferredCredential.cache_ = set()
         credential = AzureSdkCredential(skip_confirmation=False)
         with pytest.raises(
-            DataSafeHavenAzureError,
-            match="Error getting account information from Azure CLI.",
+            Exit
         ):
             credential.get_credential()
 
@@ -62,8 +61,7 @@ class TestDeferredCredential:
     ):
         credential = AzureSdkCredential(skip_confirmation=True)
         with pytest.raises(
-            DataSafeHavenAzureError,
-            match="Error getting account information from Azure CLI.",
+            Exit
         ):
             credential.decode_token(credential.token)
 
