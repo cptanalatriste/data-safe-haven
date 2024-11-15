@@ -10,6 +10,7 @@ from data_safe_haven.config import ContextManager, DSHPulumiConfig, SHMConfig, S
 from data_safe_haven.exceptions import DataSafeHavenError
 from data_safe_haven.external import GraphApi
 from data_safe_haven.logging import get_logger
+from data_safe_haven.infrastructure import SREProjectManager
 
 users_command_group = typer.Typer()
 
@@ -121,8 +122,9 @@ def register(
         try:
             shm_config = SHMConfig.from_remote(context)
         except DataSafeHavenError:
-            logger.error("Have you deployed the SHM?")
-            raise
+            msg = "Have you deployed the SHM?"
+            logger.error(msg)
+            raise DataSafeHavenError(msg)
 
         # Load Pulumi config
         pulumi_config = DSHPulumiConfig.from_remote(context)
@@ -132,7 +134,13 @@ def register(
         if sre_config.name not in pulumi_config.project_names:
             msg = f"Could not load Pulumi settings for '{sre_config.name}'. Have you deployed the SRE?"
             logger.error(msg)
-            raise DataSafeHavenError(msg)
+            raise typer.Exit(1)
+
+        sre_stack = SREProjectManager(
+            context=context,
+            config=sre_config,
+            pulumi_config=pulumi_config,
+        )
 
         # Load GraphAPI
         graph_api = GraphApi.from_scopes(
@@ -155,13 +163,14 @@ def register(
             for user in available_users
         }
         usernames_to_register = []
+        shm_name = sre_stack.output("linked_shm")["name"]
         for username in usernames:
             if username in user_dict.keys():
                 user_domain = user_dict[username]
-                if user_domain != shm_config.shm.fqdn:
+                if shm_name not in user_domain:
                     logger.error(
                         f"Username '{username}' belongs to SHM domain '{user_domain}'.\n"
-                        f"SRE '{sre_config.name}' is associated with SHM domain '{shm_config.shm.fqdn}'.\n"
+                        f"SRE '{sre_config.name}' is associated with SHM domain '{shm_name}'.\n"
                         "Users can only be registered to one SHM domain.\n"
                         "Please use 'dsh users add' to create a new user associated with the current SHM domain."
                     )
