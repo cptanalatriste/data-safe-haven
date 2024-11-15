@@ -141,7 +141,7 @@ Tearing down the SHM also renders the SREs inaccessible to users and prevents th
 All SREs associated with the SHM should be torn down before the SHM is torn down.
 ::::
 
-### Updating SRE configurations
+### Updating SREs
 
 Changes to SRE configurations are made by first editing the relevant configuration file for the SRE, uploading the new configuration, and then redeploying the SRE.
 
