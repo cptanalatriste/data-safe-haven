@@ -164,8 +164,7 @@ $ dsh config upload YOUR_SRE_NAME.yaml
 ```
 
 - You will be shown the differences between the existing configuration and the new configuration and asked to confirm that they are correct.
-
-- Finally, redeploy your SRE for the infrastructure to reflect your new changes
+- Finally, deploy your SRE to apply any changes:
 
 ```{code} shell
 $ dsh sre deploy YOUR_SRE_NAME
