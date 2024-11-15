@@ -269,6 +269,7 @@ class DeclarativeSRE:
                 entra_application_secret=entra.identity_application_secret,
                 entra_tenant_id=shm_entra_tenant_id,
                 location=self.config.azure.location,
+                log_analytics_workspace=monitoring.log_analytics,
                 resource_group_name=resource_group.name,
                 shm_fqdn=shm_fqdn,
                 sre_fqdn=networking.sre_fqdn,
