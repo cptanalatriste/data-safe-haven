@@ -248,6 +248,7 @@ class DeclarativeSRE:
                 dns_server_ip=dns.ip_address,
                 dockerhub_credentials=dockerhub_credentials,
                 location=self.config.azure.location,
+                log_analytics_workspace=monitoring.log_analytics,
                 resource_group_name=resource_group.name,
                 sre_fqdn=networking.sre_fqdn,
                 storage_account_key=data.storage_account_data_configuration_key,
