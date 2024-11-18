@@ -15,19 +15,19 @@
 # - azure-mgmt-rdbms==10.1.0
 # - azure-mgmt-resource==23.2.0
 # - azure-mgmt-storage==21.2.1
-# - azure-storage-blob==12.23.1
-# - azure-storage-file-datalake==12.17.0
-# - azure-storage-file-share==12.19.0
+# - azure-storage-blob==12.24.0
+# - azure-storage-file-datalake==12.18.0
+# - azure-storage-file-share==12.20.0
 # - chevron==0.14.0
 # - cryptography==43.0.3
 # - fqdn==1.5.1
 # - psycopg[binary]==3.1.19
-# - pulumi-azure-native==2.71.0
+# - pulumi-azure-native==2.72.0
 # - pulumi-azuread==6.0.1
 # - pulumi-random==4.16.7
-# - pulumi==3.138.0
+# - pulumi==3.139.0
 # - pydantic==2.9.2
-# - pyjwt[crypto]==2.9.0
+# - pyjwt[crypto]==2.10.0
 # - pytz==2024.2
 # - pyyaml==6.0.2
 # - rich==13.9.4
@@ -102,13 +102,13 @@ azure-mgmt-resource==23.2.0
     # via hatch.envs.default
 azure-mgmt-storage==21.2.1
     # via hatch.envs.default
-azure-storage-blob==12.23.1
+azure-storage-blob==12.24.0
     # via
     #   hatch.envs.default
     #   azure-storage-file-datalake
-azure-storage-file-datalake==12.17.0
+azure-storage-file-datalake==12.18.0
     # via hatch.envs.default
-azure-storage-file-share==12.19.0
+azure-storage-file-share==12.20.0
     # via hatch.envs.default
 certifi==2024.8.30
     # via
@@ -192,13 +192,13 @@ psycopg==3.1.19
     # via hatch.envs.default
 psycopg-binary==3.1.19
     # via psycopg
-pulumi==3.138.0
+pulumi==3.139.0
     # via
     #   hatch.envs.default
     #   pulumi-azure-native
     #   pulumi-azuread
     #   pulumi-random
-pulumi-azure-native==2.71.0
+pulumi-azure-native==2.72.0
     # via hatch.envs.default
 pulumi-azuread==6.0.1
     # via hatch.envs.default
@@ -212,7 +212,7 @@ pydantic-core==2.23.4
     # via pydantic
 pygments==2.18.0
     # via rich
-pyjwt==2.9.0
+pyjwt==2.10.0
     # via
     #   hatch.envs.default
     #   msal
