@@ -3,9 +3,9 @@ from azure.identity import (
     AzureCliCredential,
     DeviceCodeCredential,
 )
-from click.exceptions import Exit
 
 from data_safe_haven.directories import config_dir
+from data_safe_haven.exceptions import DataSafeHavenAzureError
 from data_safe_haven.external.api.credentials import (
     AzureSdkCredential,
     DeferredCredential,
@@ -36,7 +36,10 @@ class TestDeferredCredential:
     ):
         DeferredCredential.cache_ = set()
         credential = AzureSdkCredential(skip_confirmation=False)
-        with pytest.raises(Exit):
+        with pytest.raises(
+            DataSafeHavenAzureError,
+            match="Error getting account information from Azure CLI.",
+        ):
             credential.get_credential()
 
     def test_confirm_credentials_interactive_cache(
@@ -58,7 +61,10 @@ class TestDeferredCredential:
         self, mock_azureclicredential_get_token_invalid  # noqa: ARG002
     ):
         credential = AzureSdkCredential(skip_confirmation=True)
-        with pytest.raises(Exit):
+        with pytest.raises(
+            DataSafeHavenAzureError,
+            match="Error getting account information from Azure CLI.",
+        ):
             credential.decode_token(credential.token)
 
 
