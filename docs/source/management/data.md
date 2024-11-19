@@ -1,6 +1,6 @@
 # Managing data ingress and egress
 
-## Data Ingress
+## Data ingress
 
 It is the {ref}`role_data_provider_representative`'s responsibility to upload the data required by the safe haven.
 
