@@ -28,6 +28,7 @@ class DeferredCredential(TokenCredential):
 
     tokens_: ClassVar[dict[str, AccessToken]] = {}
     cache_: ClassVar[set[tuple[str, str]]] = set()
+    name: ClassVar[str] = "Credential name"
 
     def __init__(
         self,
@@ -66,7 +67,6 @@ class DeferredCredential(TokenCredential):
 
     def confirm_credentials_interactive(
         self,
-        target_name: str,
         user_name: str,
         user_id: str,
         tenant_name: str,
@@ -86,7 +86,7 @@ class DeferredCredential(TokenCredential):
         if (user_id, tenant_id) in DeferredCredential.cache_:
             return
         DeferredCredential.cache_.add((user_id, tenant_id))
-        self.logger.info(f"You are logged into the [blue]{target_name}[/] as:")
+        self.logger.info(f"You are logged into the [blue]{self.name}[/] as:")
         self.logger.info(f"\tuser: [green]{user_name}[/] ({user_id})")
         self.logger.info(f"\ttenant: [green]{tenant_name}[/] ({tenant_id})")
         if not console.confirm("Are these details correct?", default_to_yes=True):
@@ -118,6 +118,7 @@ class AzureSdkCredential(DeferredCredential):
 
     Uses AzureCliCredential for authentication
     """
+    name: ClassVar[str] = "Azure CLI"
 
     def __init__(
         self,
@@ -134,7 +135,6 @@ class AzureSdkCredential(DeferredCredential):
         try:
             decoded = self.decode_token(credential.get_token(*self.scopes).token)
             self.confirm_credentials_interactive(
-                "Azure CLI",
                 user_name=decoded["name"],
                 user_id=decoded["oid"],
                 tenant_name=decoded["upn"].split("@")[1],
@@ -155,6 +155,7 @@ class GraphApiCredential(DeferredCredential):
 
     Uses DeviceCodeCredential for authentication
     """
+    name: ClassVar[str] = "Microsoft Graph API"
 
     def __init__(
         self,
@@ -215,7 +216,6 @@ class GraphApiCredential(DeferredCredential):
 
         # Confirm that these are the desired credentials
         self.confirm_credentials_interactive(
-            "Microsoft Graph API",
             user_name=new_auth_record.username,
             user_id=new_auth_record._home_account_id.split(".")[0],
             tenant_name=new_auth_record._username.split("@")[1],
