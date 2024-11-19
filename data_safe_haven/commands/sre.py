@@ -6,10 +6,7 @@ import typer
 
 from data_safe_haven import console
 from data_safe_haven.config import ContextManager, DSHPulumiConfig, SHMConfig, SREConfig
-from data_safe_haven.exceptions import (
-    DataSafeHavenConfigError,
-    DataSafeHavenError,
-)
+from data_safe_haven.exceptions import DataSafeHavenConfigError, DataSafeHavenError
 from data_safe_haven.external import AzureSdk, GraphApi
 from data_safe_haven.functions import current_ip_address, ip_address_in_list
 from data_safe_haven.infrastructure import SREProjectManager
