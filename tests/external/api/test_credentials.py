@@ -33,6 +33,7 @@ class TestAzureSdkCredential:
         self,
         mock_confirm_no,  # noqa: ARG002
         mock_azureclicredential_get_token,  # noqa: ARG002
+        capsys,
     ):
         DeferredCredential.cache_ = set()
         credential = AzureSdkCredential(skip_confirmation=False)
@@ -41,6 +42,8 @@ class TestAzureSdkCredential:
             match="Selected credentials are incorrect.",
         ):
             credential.get_credential()
+        out, _ = capsys.readouterr()
+        assert "Please authenticate with Azure: run 'az login'" in out
 
     def test_confirm_credentials_interactive_cache(
         self,
