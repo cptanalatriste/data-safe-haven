@@ -38,19 +38,19 @@ dependencies = [
   "azure-mgmt-rdbms==10.1.0",
   "azure-mgmt-resource==23.2.0",
   "azure-mgmt-storage==21.2.1",
-  "azure-storage-blob==12.23.1",
-  "azure-storage-file-datalake==12.17.0",
-  "azure-storage-file-share==12.19.0",
+  "azure-storage-blob==12.24.0",
+  "azure-storage-file-datalake==12.18.0",
+  "azure-storage-file-share==12.20.0",
   "chevron==0.14.0",
   "cryptography==43.0.3",
   "fqdn==1.5.1",
   "psycopg[binary]==3.1.19", # needed for installation on older MacOS versions
-  "pulumi-azure-native==2.71.0",
+  "pulumi-azure-native==2.72.0",
   "pulumi-azuread==6.0.1",
   "pulumi-random==4.16.7",
-  "pulumi==3.138.0",
+  "pulumi==3.139.0",
   "pydantic==2.9.2",
-  "pyjwt[crypto]==2.9.0",
+  "pyjwt[crypto]==2.10.0",
   "pytz==2024.2",
   "pyyaml==6.0.2",
   "rich==13.9.4",
@@ -79,7 +79,7 @@ lint = [
   "mypy==1.13.0",
   "pandas-stubs==2.2.3.241009",
   "pydantic==2.9.2",
-  "ruff==0.7.3",
+  "ruff==0.7.4",
   "types-appdirs==1.4.3.5",
   "types-chevron==0.14.2.20240310",
   "types-pytz==2024.2.0.20241003",
@@ -87,7 +87,7 @@ lint = [
   "types-requests==2.32.0.20241016",
 ]
 test = [
-  "coverage==7.6.4",
+  "coverage==7.6.7",
   "freezegun==1.5.1",
   "pytest-mock==3.14.0",
   "pytest==8.3.3",
@@ -158,7 +158,7 @@ pip-compile-constraint = "default"
 features = ["test"]
 
 [tool.hatch.envs.test.scripts]
-test = "coverage run -m pytest {args: tests}"
+test = "coverage run -m pytest {args:} ./tests"
 test-report = "coverage report {args:}"
 test-coverage = ["test", "test-report"]
 

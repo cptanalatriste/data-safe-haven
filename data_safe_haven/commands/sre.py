@@ -96,6 +96,7 @@ def deploy(
         )
         # Set Entra options
         application = graph_api.get_application_by_name(context.entra_application_name)
+
         if not application:
             msg = f"No Entra application '{context.entra_application_name}' was found. Please redeploy your SHM."
             raise DataSafeHavenConfigError(msg)

@@ -141,6 +141,43 @@ Tearing down the SHM also renders the SREs inaccessible to users and prevents th
 All SREs associated with the SHM should be torn down before the SHM is torn down.
 ::::
 
+### Updating SREs
+
+SREs are modified by updating the configuration then running the deploy command.
+
+- The existing configuration for the SRE can be shown using the following:
+
+```{code} shell
+$ dsh config show YOUR_SRE_NAME
+```
+
+- If you do not have a local copy, you can write one with the `--file` option:
+
+```{code} shell
+$ dsh config show YOUR_SRE_NAME --file YOUR_SRE_NAME.yaml
+```
+
+- Edit the configuration file locally, and upload the new version:
+
+```{code} shell
+$ dsh config upload YOUR_SRE_NAME.yaml
+```
+
+- You will be shown the differences between the existing configuration and the new configuration and asked to confirm that they are correct.
+- Finally, deploy your SRE to apply any changes:
+
+```{code} shell
+$ dsh sre deploy YOUR_SRE_NAME
+```
+
+::::{admonition} Changing administrator IP addresses
+:class: warning
+The administrator IP addresses declared in the SRE configuration are used to create access rules for SRE infrastructure.
+Therefore, after an SRE has been deployed, some changes can only be made from IP addresses on that list.
+
+As a consequence, if you want to update the list of administrator IP addresses, for example to add a new administrator, you must do so from an IP address that is already allowed.
+::::
+
 ## Managing data ingress and egress
 
 ### Data Ingress
