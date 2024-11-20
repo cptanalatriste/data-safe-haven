@@ -13,7 +13,6 @@ from dns import resolver
 
 from data_safe_haven import console
 from data_safe_haven.exceptions import (
-    DataSafeHavenAzureError,
     DataSafeHavenMicrosoftGraphError,
     DataSafeHavenValueError,
 )
@@ -839,7 +838,6 @@ class GraphApi:
                 ]
             ]
         except (
-            DataSafeHavenAzureError,
             DataSafeHavenMicrosoftGraphError,
             requests.JSONDecodeError,
         ) as exc:
