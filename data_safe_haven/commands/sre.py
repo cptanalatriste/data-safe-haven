@@ -163,6 +163,13 @@ def deploy(
             timezone=sre_config.sre.timezone,
         )
         manager.run()
+
+        console.print(
+            f"Secure Research Environment '[green]{name}[/]' has been successfully deployed.",
+            f"The SRE can be accessed at [green]https://{stack.output('sre_fqdn')}[/]",
+            sep="\n",
+        )
+
     except DataSafeHavenError as exc:
         logger.critical(
             f"Could not deploy Secure Research Environment '[green]{name}[/]'."
