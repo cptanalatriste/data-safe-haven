@@ -158,7 +158,7 @@ pip-compile-constraint = "default"
 features = ["test"]
 
 [tool.hatch.envs.test.scripts]
-test = "coverage run -m pytest {args: tests}"
+test = "coverage run -m pytest {args:} ./tests"
 test-report = "coverage report {args:}"
 test-coverage = ["test", "test-report"]
 
