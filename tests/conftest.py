@@ -29,7 +29,10 @@ from data_safe_haven.config.config_sections import (
 )
 from data_safe_haven.exceptions import DataSafeHavenAzureError
 from data_safe_haven.external import AzureSdk, PulumiAccount
-from data_safe_haven.external.api.credentials import GraphApiCredential, AzureSdkCredential
+from data_safe_haven.external.api.credentials import (
+    AzureSdkCredential,
+    GraphApiCredential,
+)
 from data_safe_haven.infrastructure import SREProjectManager
 from data_safe_haven.infrastructure.project_manager import ProjectManager
 from data_safe_haven.logging import init_logging

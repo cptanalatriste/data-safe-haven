@@ -40,9 +40,7 @@ class TestDeploySRE:
         mock_sre_config_from_remote,  # noqa: ARG002
         mock_graphapi_get_credential,  # noqa: ARG002
     ) -> None:
-        mocker.patch.object(
-            GraphApi, "get_application_by_name", return_value=None
-        )
+        mocker.patch.object(GraphApi, "get_application_by_name", return_value=None)
 
         result = runner.invoke(sre_command_group, ["deploy", "sandbox"])
         assert result.exit_code == 1

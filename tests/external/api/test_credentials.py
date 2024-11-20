@@ -5,7 +5,10 @@ from azure.identity import (
 )
 
 from data_safe_haven.directories import config_dir
-from data_safe_haven.exceptions import DataSafeHavenAzureError, DataSafeHavenCachedCredentialError
+from data_safe_haven.exceptions import (
+    DataSafeHavenAzureError,
+    DataSafeHavenCachedCredentialError,
+)
 from data_safe_haven.external.api.credentials import (
     AzureSdkCredential,
     DeferredCredential,
