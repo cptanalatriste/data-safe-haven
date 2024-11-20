@@ -165,8 +165,9 @@ def deploy(
         manager.run()
 
         console.print(
-            f"Secure Research Environment '[green]{name}[/]' has been successfully deployed. \n"
-            f"The SRE can be accessed at https://{stack.output("sre_fqdn")}"
+            f"Secure Research Environment '[green]{name}[/]' has been successfully deployed.",
+            f"The SRE can be accessed at [green]https://{stack.output('sre_fqdn')}[/]",
+            sep="\n",
         )
 
     except DataSafeHavenError as exc:
