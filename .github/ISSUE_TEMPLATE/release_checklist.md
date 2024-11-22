@@ -44,16 +44,16 @@ Refer to the [Deployment](https://data-safe-haven.readthedocs.io/en/latest/deplo
 - [ ] Update supported versions in `SECURITY.md`
 - [ ] Update pen test results in `VERSIONING.md`
 
-## :computer: Release information
+### Making the release
 
-- **Version number:** _
-- **SHM ID:** _
-- **T2 SRE ID:** _
-- **T3 SRE ID:** _
+- [ ] Merge release branch into `latest`
+- [ ] Push tag in the format `v0.0.1` to the merge commit into `latest`
+- [ ] Ensure docs for the latest version are built and deployed on ReadTheDocs
+- [ ] Push a build to PyPI
+- [ ] Announce release on communications channels
 
 ## :deciduous_tree: Deployment problems
 
 <!--
 Keep a record in this issue of problems and fixes implemented during the release process. Be sure to update the changelog if any new commits are added to the release branch.
 -->
-
