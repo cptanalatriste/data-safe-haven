@@ -121,9 +121,9 @@ def register(
         # Load SHMConfig
         try:
             shm_config = SHMConfig.from_remote(context)
-        except DataSafeHavenError:
+        except DataSafeHavenError as exc:
             logger.error("Have you deployed the SHM?")
-            raise typer.Exit(1)
+            raise typer.Exit(1) from exc
 
         # Load Pulumi config
         pulumi_config = DSHPulumiConfig.from_remote(context)
