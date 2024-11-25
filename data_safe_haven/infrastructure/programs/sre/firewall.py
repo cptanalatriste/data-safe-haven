@@ -336,7 +336,7 @@ class SREFirewallComponent(ComponentResource):
 
         # Add diagnostic settings for firewall
         # This links the firewall to the log analytics workspace
-        insights.DiagnosticSettings(
+        insights.DiagnosticSetting(
             f"{self._name}_firewall_diagnostic_settings",
             name="firewall_diagnostic_settings",
             log_analytics_destination_type="Dedicated",
