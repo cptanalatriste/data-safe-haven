@@ -41,11 +41,11 @@ __all__ = [
     "MicrosoftSQLDatabaseProps",
     "NFSV3BlobContainerComponent",
     "NFSV3BlobContainerProps",
-    "WrappedNFSV3StorageAccount",
     "PostgresqlDatabaseComponent",
     "PostgresqlDatabaseProps",
     "SSLCertificate",
     "SSLCertificateProps",
     "VMComponent",
     "WrappedLogAnalyticsWorkspace",
+    "WrappedNFSV3StorageAccount",
 ]
