@@ -9,8 +9,8 @@ from data_safe_haven.administration.users import UserHandler
 from data_safe_haven.config import ContextManager, DSHPulumiConfig, SHMConfig, SREConfig
 from data_safe_haven.exceptions import DataSafeHavenError
 from data_safe_haven.external import GraphApi
-from data_safe_haven.logging import get_logger
 from data_safe_haven.infrastructure import SREProjectManager
+from data_safe_haven.logging import get_logger
 
 users_command_group = typer.Typer()
 
@@ -122,9 +122,8 @@ def register(
         try:
             shm_config = SHMConfig.from_remote(context)
         except DataSafeHavenError:
-            msg = "Have you deployed the SHM?"
-            logger.error(msg)
-            raise DataSafeHavenError(msg)
+            logger.error("Have you deployed the SHM?")
+            raise typer.Exit(1)
 
         # Load Pulumi config
         pulumi_config = DSHPulumiConfig.from_remote(context)
@@ -154,7 +153,6 @@ def register(
 
         # List users
         users = UserHandler(context, graph_api)
-        # available_usernames = users.get_usernames_entra_id()
         available_users = users.entra_users.list()
         user_dict = {
             user.user_principal_name.split("@")[0]: user.user_principal_name.split("@")[
@@ -163,16 +161,15 @@ def register(
             for user in available_users
         }
         usernames_to_register = []
-        shm_name = sre_stack.output("linked_shm")["name"]
+        shm_name = sre_stack.output("context")
         for username in usernames:
             if username in user_dict.keys():
-                user_domain = user_dict[username]
+                user_domain = user_dict[username].split(".")[0]
                 if shm_name not in user_domain:
                     logger.error(
-                        f"Username '{username}' belongs to SHM domain '{user_domain}'.\n"
-                        f"SRE '{sre_config.name}' is associated with SHM domain '{shm_name}'.\n"
-                        "Users can only be registered to one SHM domain.\n"
-                        "Please use 'dsh users add' to create a new user associated with the current SHM domain."
+                        f"Username [green]'{username}'[/green] belongs to SHM context [blue]'{user_domain}'[/blue].\n"
+                        f"SRE [yellow]'{sre_config.name}'[/yellow] belongs to SHM context [blue]'{shm_name}'[/blue].\n"
+                        "The user must belong to the same SHM context as the SRE."
                     )
                 else:
                     usernames_to_register.append(username)
