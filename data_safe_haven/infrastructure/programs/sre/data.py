@@ -33,6 +33,7 @@ from data_safe_haven.infrastructure.components import (
     NFSV3BlobContainerProps,
     SSLCertificate,
     SSLCertificateProps,
+    WrappedLogAnalyticsWorkspace,
     WrappedNFSV3StorageAccount,
 )
 from data_safe_haven.types import AzureDnsZoneNames, AzureServiceTag
@@ -51,6 +52,7 @@ class SREDataProps:
         dns_record: Input[network.RecordSet],
         dns_server_admin_password: Input[pulumi_random.RandomPassword],
         location: Input[str],
+        log_analytics_workspace: Input[WrappedLogAnalyticsWorkspace],
         resource_group: Input[resources.ResourceGroup],
         sre_fqdn: Input[str],
         storage_quota_gb_home: Input[int],
@@ -69,6 +71,7 @@ class SREDataProps:
         self.dns_record = dns_record
         self.password_dns_server_admin = dns_server_admin_password
         self.location = location
+        self.log_analytics_workspace = log_analytics_workspace
         self.resource_group_id = Output.from_input(resource_group).apply(get_id_from_rg)
         self.resource_group_name = Output.from_input(resource_group).apply(
             get_name_from_rg
@@ -492,6 +495,7 @@ class SREDataComponent(ComponentResource):
                 # 65533 ownership of the fileshare (preventing use inside the SRE)
                 apply_default_permissions=False,
                 container_name="egress",
+                log_analytics_workspace=props.log_analytics_workspace,
                 resource_group_name=props.resource_group_name,
                 storage_account=storage_account_data_private_sensitive,
                 subscription_name=props.subscription_name,
@@ -507,6 +511,7 @@ class SREDataComponent(ComponentResource):
                 # files (eg. with Azure Storage Explorer)
                 apply_default_permissions=True,
                 container_name="ingress",
+                log_analytics_workspace=props.log_analytics_workspace,
                 resource_group_name=props.resource_group_name,
                 storage_account=storage_account_data_private_sensitive,
                 subscription_name=props.subscription_name,

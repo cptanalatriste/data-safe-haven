@@ -1,9 +1,10 @@
 from pulumi import ComponentResource, Input, ResourceOptions
-from pulumi_azure_native import storage
+from pulumi_azure_native import insights, storage
 
-from data_safe_haven.infrastructure.components.dynamic.blob_container_acl import (
+from data_safe_haven.infrastructure.components import (
     BlobContainerAcl,
     BlobContainerAclProps,
+    WrappedLogAnalyticsWorkspace,
 )
 
 
@@ -15,6 +16,7 @@ class NFSV3BlobContainerProps:
         acl_other: Input[str],
         apply_default_permissions: Input[bool],
         container_name: Input[str],
+        log_analytics_workspace: Input[WrappedLogAnalyticsWorkspace],
         resource_group_name: Input[str],
         storage_account: Input[storage.StorageAccount],
         subscription_name: Input[str],
@@ -24,6 +26,7 @@ class NFSV3BlobContainerProps:
         self.acl_other = acl_other
         self.apply_default_permissions = apply_default_permissions
         self.container_name = container_name
+        self.log_analytics_workspace = log_analytics_workspace
         self.resource_group_name = resource_group_name
         self.storage_account = storage_account
         self.subscription_name = subscription_name
@@ -52,6 +55,7 @@ class NFSV3BlobContainerComponent(ComponentResource):
                 ResourceOptions(parent=props.storage_account),
             ),
         )
+
         BlobContainerAcl(
             f"{storage_container._name}_acl",
             BlobContainerAclProps(
@@ -68,6 +72,42 @@ class NFSV3BlobContainerComponent(ComponentResource):
                 child_opts,
                 ResourceOptions(parent=props.storage_account),
             ),
+        )
+
+        insights.DiagnosticSetting(
+            f"{storage_container._name}_diagnostic_settings",
+            name="firewall_diagnostic_settings",
+            log_analytics_destination_type="Dedicated",
+            logs=[
+                {
+                    "category_group": "allLogs",
+                    "enabled": True,
+                    "retention_policy": {
+                        "days": 0,
+                        "enabled": False,
+                    },
+                },
+                {
+                    "category_group": "audit",
+                    "enabled": True,
+                    "retention_policy": {
+                        "days": 0,
+                        "enabled": False,
+                    },
+                },
+            ],
+            metrics=[
+                {
+                    "category": "Transaction",
+                    "enabled": True,
+                    "retention_policy": {
+                        "days": 0,
+                        "enabled": False,
+                    },
+                }
+            ],
+            resource_uri=storage_container.id,
+            workspace_id=props.log_analytics_workspace.id,
         )
 
         self.name = storage_container.name
