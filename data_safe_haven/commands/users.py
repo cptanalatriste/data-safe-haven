@@ -158,14 +158,14 @@ def register(
                 if shm_config.shm.fqdn not in user_domain:
                     logger.error(
                         f"User [green]'{username}'[/green]'s principal domain name is [blue]'{user_domain}'[/blue].\n"
-                        f"SRE [yellow]'{sre_config.name}'[/yellow] belongs to SHM domain [blue]'{shm_config.shm.fqdn}'[/blue].\n"
+                        f"SRE [yellow]'{sre}'[/yellow] belongs to SHM domain [blue]'{shm_config.shm.fqdn}'[/blue].\n"
                         "The user's principal domain name must match the domain of the SRE to be registered."
                     )
                 else:
                     usernames_to_register.append(username)
             else:
                 logger.error(
-                    f"Username '{username}' does not belong to this Data Safe Haven deployment."
+                    f"Username '{username}' does not belong to this Data Safe Haven deployment.\n"
                     "Please use 'dsh users add' to create this user."
                 )
         users.register(sre_config.name, usernames_to_register)
