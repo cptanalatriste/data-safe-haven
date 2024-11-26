@@ -34,10 +34,10 @@ Refer to the [Deployment](https://data-safe-haven.readthedocs.io/en/latest/deplo
 ### For major releases only
 
 - [ ] Confirm that a third party has carried out a full penetration test evaluating:
-  1. external attack surface
-  1. ability to exfiltrate data from the system
-  1. ability to transfer data between SREs
-  1. ability to escalate privileges on the SRD.
+    1. external attack surface
+    1. ability to exfiltrate data from the system
+    1. ability to transfer data between SREs
+    1. ability to escalate privileges on the SRD.
 
 ### Update documentation
 
