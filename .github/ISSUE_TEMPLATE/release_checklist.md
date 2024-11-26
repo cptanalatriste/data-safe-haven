@@ -47,7 +47,8 @@ Refer to the [Deployment](https://data-safe-haven.readthedocs.io/en/latest/deplo
 ### Making the release
 
 - [ ] Merge release branch into `latest`
-- [ ] Push tag in the format `v0.0.1` to the merge commit into `latest`
+- [ ] Create a tag of the form `v0.0.1` pointing to the most recent commit on `latest` (the merge that you just made)
+- [ ] Publish your draft GitHub release using this tag
 - [ ] Ensure docs for the latest version are built and deployed on ReadTheDocs
 - [ ] Push a build to PyPI
 - [ ] Announce release on communications channels
