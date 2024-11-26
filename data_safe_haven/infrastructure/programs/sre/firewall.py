@@ -361,7 +361,7 @@ class SREFirewallComponent(ComponentResource):
                 }
             ],
             resource_uri=firewall.id,
-            workspace_id=props.log_analytics_workspace.workspace_id,
+            workspace_id=props.log_analytics_workspace.id,
         )
 
         # Retrieve the private IP address for the firewall
