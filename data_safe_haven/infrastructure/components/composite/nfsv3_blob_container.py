@@ -1,9 +1,11 @@
 from pulumi import ComponentResource, Input, ResourceOptions
 from pulumi_azure_native import insights, storage
 
-from data_safe_haven.infrastructure.components import (
+from data_safe_haven.infrastructure.components.dynamic import (
     BlobContainerAcl,
     BlobContainerAclProps,
+)
+from data_safe_haven.infrastructure.components.wrapped import (
     WrappedLogAnalyticsWorkspace,
 )
 
