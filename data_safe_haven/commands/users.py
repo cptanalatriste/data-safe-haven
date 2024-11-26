@@ -161,11 +161,10 @@ def register(
             for user in available_users
         }
         usernames_to_register = []
-        shm_name = sre_stack.output("context")
         for username in usernames:
             if username in user_dict.keys():
                 user_domain = user_dict[username]
-                if shm_name not in user_domain:
+                if shm_config.shm.fqdn not in user_domain:
                     logger.error(
                         f"User [green]'{username}'[/green]'s principal domain name is [blue]'{user_domain}'[/blue].\n"
                         f"SRE [yellow]'{sre_config.name}'[/yellow] belongs to SHM domain [blue]'{shm_config.shm.fqdn}'[/blue].\n"
