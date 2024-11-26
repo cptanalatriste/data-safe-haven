@@ -11,10 +11,9 @@ from data_safe_haven.infrastructure.common import (
     get_ip_address_from_container_group,
 )
 from data_safe_haven.infrastructure.components import (
-    EntraApplication,
-    EntraApplicationProps,
     LocalDnsRecordComponent,
     LocalDnsRecordProps,
+    WrappedLogAnalyticsWorkspace,
 )
 
 
@@ -25,10 +24,11 @@ class SREIdentityProps:
         self,
         dns_server_ip: Input[str],
         dockerhub_credentials: DockerHubCredentials,
-        entra_application_name: Input[str],
-        entra_auth_token: str,
+        entra_application_id: Input[str],
+        entra_application_secret: Input[str],
         entra_tenant_id: Input[str],
         location: Input[str],
+        log_analytics_workspace: Input[WrappedLogAnalyticsWorkspace],
         resource_group_name: Input[str],
         shm_fqdn: Input[str],
         sre_fqdn: Input[str],
@@ -38,10 +38,11 @@ class SREIdentityProps:
     ) -> None:
         self.dns_server_ip = dns_server_ip
         self.dockerhub_credentials = dockerhub_credentials
-        self.entra_application_name = entra_application_name
-        self.entra_auth_token = entra_auth_token
+        self.entra_application_id = entra_application_id
+        self.entra_application_secret = entra_application_secret
         self.entra_tenant_id = entra_tenant_id
         self.location = location
+        self.log_analytics_workspace = log_analytics_workspace
         self.resource_group_name = resource_group_name
         self.shm_fqdn = shm_fqdn
         self.sre_fqdn = sre_fqdn
@@ -82,20 +83,6 @@ class SREIdentityComponent(ComponentResource):
             opts=child_opts,
         )
 
-        # Define Entra ID application
-        entra_application = EntraApplication(
-            f"{self._name}_entra_application",
-            EntraApplicationProps(
-                application_name=props.entra_application_name,
-                application_role_assignments=["User.Read.All", "GroupMember.Read.All"],
-                application_secret_name="Apricot Authentication Secret",
-                delegated_role_assignments=["User.Read.All"],
-                public_client_redirect_uri="urn:ietf:wg:oauth:2.0:oob",
-            ),
-            auth_token=props.entra_auth_token,
-            opts=child_opts,
-        )
-
         # Define the LDAP server container group with Apricot
         container_group = containerinstance.ContainerGroup(
             f"{self._name}_container_group",
@@ -111,11 +98,11 @@ class SREIdentityComponent(ComponentResource):
                         ),
                         containerinstance.EnvironmentVariableArgs(
                             name="CLIENT_ID",
-                            value=entra_application.application_id,
+                            value=props.entra_application_id,
                         ),
                         containerinstance.EnvironmentVariableArgs(
                             name="CLIENT_SECRET",
-                            secure_value=entra_application.application_secret,
+                            secure_value=props.entra_application_secret,
                         ),
                         containerinstance.EnvironmentVariableArgs(
                             name="DEBUG",
@@ -179,6 +166,12 @@ class SREIdentityComponent(ComponentResource):
                     ],
                 ),
             ],
+            diagnostics=containerinstance.ContainerGroupDiagnosticsArgs(
+                log_analytics=containerinstance.LogAnalyticsArgs(
+                    workspace_id=props.log_analytics_workspace.workspace_id,
+                    workspace_key=props.log_analytics_workspace.workspace_key,
+                ),
+            ),
             dns_config=containerinstance.DnsConfigurationArgs(
                 name_servers=[props.dns_server_ip],
             ),

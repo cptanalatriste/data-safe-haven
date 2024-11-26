@@ -1,4 +1,7 @@
 from .composite import (
+    EntraApplicationComponent,
+    EntraDesktopApplicationProps,
+    EntraWebApplicationProps,
     LinuxVMComponentProps,
     LocalDnsRecordComponent,
     LocalDnsRecordProps,
@@ -13,8 +16,6 @@ from .composite import (
 from .dynamic import (
     BlobContainerAcl,
     BlobContainerAclProps,
-    EntraApplication,
-    EntraApplicationProps,
     FileShareFile,
     FileShareFileProps,
     SSLCertificate,
@@ -28,8 +29,9 @@ from .wrapped import (
 __all__ = [
     "BlobContainerAcl",
     "BlobContainerAclProps",
-    "EntraApplication",
-    "EntraApplicationProps",
+    "EntraApplicationComponent",
+    "EntraDesktopApplicationProps",
+    "EntraWebApplicationProps",
     "FileShareFile",
     "FileShareFileProps",
     "LinuxVMComponentProps",
@@ -39,11 +41,11 @@ __all__ = [
     "MicrosoftSQLDatabaseProps",
     "NFSV3BlobContainerComponent",
     "NFSV3BlobContainerProps",
-    "WrappedNFSV3StorageAccount",
     "PostgresqlDatabaseComponent",
     "PostgresqlDatabaseProps",
     "SSLCertificate",
     "SSLCertificateProps",
     "VMComponent",
     "WrappedLogAnalyticsWorkspace",
+    "WrappedNFSV3StorageAccount",
 ]

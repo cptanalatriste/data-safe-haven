@@ -4,6 +4,7 @@ from typing import Annotated
 
 import typer
 
+from data_safe_haven import console
 from data_safe_haven.config import ContextManager, DSHPulumiConfig, SHMConfig, SREConfig
 from data_safe_haven.exceptions import DataSafeHavenConfigError, DataSafeHavenError
 from data_safe_haven.external import AzureSdk, GraphApi
@@ -66,7 +67,6 @@ def deploy(
             config=sre_config,
             pulumi_config=pulumi_config,
             create_project=True,
-            graph_api_token=graph_api.token,
         )
         # Set Azure options
         stack.add_option(
@@ -92,14 +92,17 @@ def deploy(
         )
         logger.info(
             f"SRE will be deployed to subscription '[green]{sre_subscription_name}[/]'"
-            f" ('[bold]{sre_config.azure.subscription_id}[/]')"
+            f" ({sre_config.azure.subscription_id})"
         )
         # Set Entra options
         application = graph_api.get_application_by_name(context.entra_application_name)
+
         if not application:
             msg = f"No Entra application '{context.entra_application_name}' was found. Please redeploy your SHM."
             raise DataSafeHavenConfigError(msg)
-        stack.add_option("azuread:clientId", application.get("appId", ""), replace=True)
+        stack.add_option(
+            "azuread:clientId", application.get("appId", ""), replace=False
+        )
         if not context.entra_application_secret:
             msg = f"No Entra application secret '{context.entra_application_secret_name}' was found. Please redeploy your SHM."
             raise DataSafeHavenConfigError(msg)
@@ -107,7 +110,7 @@ def deploy(
             "azuread:clientSecret", context.entra_application_secret, replace=True
         )
         stack.add_option(
-            "azuread:tenantId", shm_config.shm.entra_tenant_id, replace=True
+            "azuread:tenantId", shm_config.shm.entra_tenant_id, replace=False
         )
         # Load SHM outputs
         stack.add_option(
@@ -136,7 +139,13 @@ def deploy(
             replace=True,
         )
         logger.info(f"SRE will be registered in SHM '[green]{shm_config.shm.fqdn}[/]'")
-        logger.info(f"SHM subscription '[green]{shm_config.azure.subscription_id}[/]'")
+        shm_subscription_name = azure_sdk.get_subscription_name(
+            shm_config.azure.subscription_id
+        )
+        logger.info(
+            f"SHM is deployed to subscription '[green]{shm_subscription_name}[/]'"
+            f" ({shm_config.azure.subscription_id})"
+        )
 
         # Deploy Azure infrastructure with Pulumi
         try:
@@ -147,7 +156,6 @@ def deploy(
 
         # Provision SRE with anything that could not be done in Pulumi
         manager = SREProvisioningManager(
-            graph_api_token=graph_api.token,
             location=sre_config.azure.location,
             sre_name=sre_config.name,
             sre_stack=stack,
@@ -155,6 +163,13 @@ def deploy(
             timezone=sre_config.sre.timezone,
         )
         manager.run()
+
+        console.print(
+            f"Secure Research Environment '[green]{name}[/]' has been successfully deployed.",
+            f"The SRE can be accessed at [green]https://{stack.output('sre_fqdn')}[/]",
+            sep="\n",
+        )
+
     except DataSafeHavenError as exc:
         logger.critical(
             f"Could not deploy Secure Research Environment '[green]{name}[/]'."
@@ -177,19 +192,23 @@ def teardown(
     """Tear down a deployed a Secure Research Environment."""
     logger = get_logger()
     try:
-        # Load context and SHM config
+        # Load context
         context = ContextManager.from_file().assert_context()
-        shm_config = SHMConfig.from_remote(context)
-
-        # Load GraphAPI as this may require user-interaction
-        graph_api = GraphApi.from_scopes(
-            scopes=["Application.ReadWrite.All", "Group.ReadWrite.All"],
-            tenant_id=shm_config.shm.entra_tenant_id,
-        )
 
         # Load Pulumi and SRE configs
         pulumi_config = DSHPulumiConfig.from_remote(context)
         sre_config = SREConfig.from_remote_by_name(context, name)
+
+        console.print(
+            "Tearing down the Secure Research Environment will permanently delete all associated resources, "
+            "including all data stored in the environment.\n"
+            "Ensure that any desired outputs have been extracted before continuing."
+        )
+        if not console.confirm(
+            "Do you wish to continue tearing down the SRE?", default_to_yes=False
+        ):
+            console.print("SRE teardown cancelled by user.")
+            raise typer.Exit(0)
 
         # Check whether current IP address is authorised to take administrator actions
         if not ip_address_in_list(sre_config.sre.admin_ip_addresses):
@@ -206,7 +225,6 @@ def teardown(
             context=context,
             config=sre_config,
             pulumi_config=pulumi_config,
-            graph_api_token=graph_api.token,
             create_project=True,
         )
         stack.teardown(force=force)

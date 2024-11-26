@@ -35,11 +35,9 @@ class DeclarativeSRE:
         self,
         context: Context,
         config: SREConfig,
-        graph_api_token: str,
     ) -> None:
         self.context = context
         self.config = config
-        self.graph_api_token = graph_api_token
         self.stack_name = replace_separators(
             f"shm-{context.name}-sre-{config.name}", "-"
         )
@@ -112,14 +110,6 @@ class DeclarativeSRE:
             ]
         )
 
-        # Deploy Entra resources
-        SREEntraComponent(
-            "sre_entra",
-            SREEntraProps(
-                group_names=ldap_group_names,
-            ),
-        )
-
         # Deploy resource group
         resource_group = resources.ResourceGroup(
             "sre_resource_group",
@@ -160,6 +150,17 @@ class DeclarativeSRE:
                 user_public_ip_ranges=self.config.sre.research_user_ip_addresses,
             ),
             tags=self.tags,
+        )
+
+        # Deploy Entra resources
+        entra = SREEntraComponent(
+            "sre_entra",
+            SREEntraProps(
+                group_names=ldap_group_names,
+                shm_name=self.context.name,
+                sre_fqdn=networking.sre_fqdn,
+                sre_name=self.config.name,
+            ),
         )
 
         # Deploy SRE firewall
@@ -208,6 +209,20 @@ class DeclarativeSRE:
             tags=self.tags,
         )
 
+        # Deploy monitoring
+        monitoring = SREMonitoringComponent(
+            "sre_monitoring",
+            self.stack_name,
+            SREMonitoringProps(
+                dns_private_zones=dns.private_zones,
+                location=self.config.azure.location,
+                resource_group_name=resource_group.name,
+                subnet=networking.subnet_monitoring,
+                timezone=self.config.sre.timezone,
+            ),
+            tags=self.tags,
+        )
+
         # Deploy the apt proxy server
         apt_proxy_server = SREAptProxyServerComponent(
             "sre_apt_proxy_server",
@@ -216,6 +231,7 @@ class DeclarativeSRE:
                 containers_subnet=networking.subnet_apt_proxy_server,
                 dns_server_ip=dns.ip_address,
                 location=self.config.azure.location,
+                log_analytics_workspace=monitoring.log_analytics,
                 resource_group_name=resource_group.name,
                 sre_fqdn=networking.sre_fqdn,
                 storage_account_key=data.storage_account_data_configuration_key,
@@ -232,6 +248,7 @@ class DeclarativeSRE:
                 dns_server_ip=dns.ip_address,
                 dockerhub_credentials=dockerhub_credentials,
                 location=self.config.azure.location,
+                log_analytics_workspace=monitoring.log_analytics,
                 resource_group_name=resource_group.name,
                 sre_fqdn=networking.sre_fqdn,
                 storage_account_key=data.storage_account_data_configuration_key,
@@ -248,10 +265,11 @@ class DeclarativeSRE:
             SREIdentityProps(
                 dns_server_ip=dns.ip_address,
                 dockerhub_credentials=dockerhub_credentials,
-                entra_application_name=f"sre-{self.config.name}-apricot",
-                entra_auth_token=self.graph_api_token,
+                entra_application_id=entra.identity_application_id,
+                entra_application_secret=entra.identity_application_secret,
                 entra_tenant_id=shm_entra_tenant_id,
                 location=self.config.azure.location,
+                log_analytics_workspace=monitoring.log_analytics,
                 resource_group_name=resource_group.name,
                 shm_fqdn=shm_fqdn,
                 sre_fqdn=networking.sre_fqdn,
@@ -288,9 +306,8 @@ class DeclarativeSRE:
                 database_password=data.password_user_database_admin,
                 dns_server_ip=dns.ip_address,
                 dockerhub_credentials=dockerhub_credentials,
-                entra_application_fqdn=networking.sre_fqdn,
-                entra_application_name=f"sre-{self.config.name}-guacamole",
-                entra_auth_token=self.graph_api_token,
+                entra_application_id=entra.remote_desktop_application_id,
+                entra_application_url=entra.remote_desktop_url,
                 entra_tenant_id=shm_entra_tenant_id,
                 ldap_group_filter=ldap_group_filter,
                 ldap_group_search_base=ldap_group_search_base,
@@ -299,6 +316,7 @@ class DeclarativeSRE:
                 ldap_user_filter=ldap_user_filter,
                 ldap_user_search_base=ldap_user_search_base,
                 location=self.config.azure.location,
+                log_analytics_workspace=monitoring.log_analytics,
                 resource_group_name=resource_group.name,
                 storage_account_key=data.storage_account_data_configuration_key,
                 storage_account_name=data.storage_account_data_configuration_name,
@@ -325,6 +343,7 @@ class DeclarativeSRE:
                 ldap_username_attribute=ldap_username_attribute,
                 ldap_user_search_base=ldap_user_search_base,
                 location=self.config.azure.location,
+                log_analytics_workspace=monitoring.log_analytics,
                 nexus_admin_password=data.password_nexus_admin,
                 resource_group_name=resource_group.name,
                 software_packages=self.config.sre.software_packages,
@@ -335,20 +354,6 @@ class DeclarativeSRE:
                 subnet_containers_support=networking.subnet_user_services_containers_support,
                 subnet_databases=networking.subnet_user_services_databases,
                 subnet_software_repositories=networking.subnet_user_services_software_repositories,
-            ),
-            tags=self.tags,
-        )
-
-        # Deploy monitoring
-        monitoring = SREMonitoringComponent(
-            "sre_monitoring",
-            self.stack_name,
-            SREMonitoringProps(
-                dns_private_zones=dns.private_zones,
-                location=self.config.azure.location,
-                resource_group_name=resource_group.name,
-                subnet=networking.subnet_monitoring,
-                timezone=self.config.sre.timezone,
             ),
             tags=self.tags,
         )
@@ -420,4 +425,5 @@ class DeclarativeSRE:
         pulumi.export("data", data.exports)
         pulumi.export("ldap", ldap_group_names)
         pulumi.export("remote_desktop", remote_desktop.exports)
+        pulumi.export("sre_fqdn", networking.sre_fqdn)
         pulumi.export("workspaces", workspaces.exports)
