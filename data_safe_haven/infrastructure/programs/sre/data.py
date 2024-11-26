@@ -7,6 +7,7 @@ import pulumi_random
 from pulumi import ComponentResource, Input, Output, ResourceOptions
 from pulumi_azure_native import (
     authorization,
+    insights,
     keyvault,
     managedidentity,
     network,
@@ -495,7 +496,6 @@ class SREDataComponent(ComponentResource):
                 # 65533 ownership of the fileshare (preventing use inside the SRE)
                 apply_default_permissions=False,
                 container_name="egress",
-                log_analytics_workspace=props.log_analytics_workspace,
                 resource_group_name=props.resource_group_name,
                 storage_account=storage_account_data_private_sensitive,
                 subscription_name=props.subscription_name,
@@ -511,11 +511,48 @@ class SREDataComponent(ComponentResource):
                 # files (eg. with Azure Storage Explorer)
                 apply_default_permissions=True,
                 container_name="ingress",
-                log_analytics_workspace=props.log_analytics_workspace,
                 resource_group_name=props.resource_group_name,
                 storage_account=storage_account_data_private_sensitive,
                 subscription_name=props.subscription_name,
             ),
+        )
+        # Add diagnostic setting for blobs
+        insights.DiagnosticSetting(
+            f"{storage_account_data_private_sensitive._name}_diagnostic_setting",
+            name=f"{storage_account_data_private_sensitive._name}_diagnostic_setting",
+            log_analytics_destination_type="Dedicated",
+            logs=[
+                {
+                    "category_group": "allLogs",
+                    "enabled": True,
+                    "retention_policy": {
+                        "days": 0,
+                        "enabled": False,
+                    },
+                },
+                {
+                    "category_group": "audit",
+                    "enabled": True,
+                    "retention_policy": {
+                        "days": 0,
+                        "enabled": False,
+                    },
+                },
+            ],
+            metrics=[
+                {
+                    "category": "Transaction",
+                    "enabled": True,
+                    "retention_policy": {
+                        "days": 0,
+                        "enabled": False,
+                    },
+                }
+            ],
+            resource_uri=storage_account_data_private_sensitive.id.apply(
+                lambda resource_id: resource_id + "/blobServices"
+            ),
+            workspace_id=props.log_analytics_workspace.id,
         )
         # Set up a private endpoint for the sensitive data storage account
         storage_account_data_private_sensitive_endpoint = network.PrivateEndpoint(
