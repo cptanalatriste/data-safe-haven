@@ -14,9 +14,9 @@ Before reporting a problem please check the following. Replace the empty checkbo
 
 Refer to the [Deployment](https://data-safe-haven.readthedocs.io/en/latest/deployment) section of our documentation when completing these steps.
 
-- [ ] Consult the `data-safe-haven/VERSIONING.md` guide and determine the version number of the new release. Record it in the title of this issue.
+- [ ] Consult the `data-safe-haven/VERSIONING.md` guide and determine the version number of the new release. Record it in the title of this issue
 - [ ] Create a release branch called e.g. `release-v0.0.1`
-- [ ] Draft a changelog for the release similar to our previous releases, see https://github.com/alan-turing-institute/data-safe-haven/releases
+- [ ] Draft a changelog for the release similar to our [previous releases](https://github.com/alan-turing-institute/data-safe-haven/releases)
 
 ### For patch releases only
 
