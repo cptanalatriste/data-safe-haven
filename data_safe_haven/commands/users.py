@@ -9,7 +9,6 @@ from data_safe_haven.administration.users import UserHandler
 from data_safe_haven.config import ContextManager, DSHPulumiConfig, SHMConfig, SREConfig
 from data_safe_haven.exceptions import DataSafeHavenError
 from data_safe_haven.external import GraphApi
-from data_safe_haven.infrastructure import SREProjectManager
 from data_safe_haven.logging import get_logger
 
 users_command_group = typer.Typer()
@@ -134,12 +133,6 @@ def register(
             msg = f"Could not load Pulumi settings for '{sre_config.name}'. Have you deployed the SRE?"
             logger.error(msg)
             raise typer.Exit(1)
-
-        sre_stack = SREProjectManager(
-            context=context,
-            config=sre_config,
-            pulumi_config=pulumi_config,
-        )
 
         # Load GraphAPI
         graph_api = GraphApi.from_scopes(
