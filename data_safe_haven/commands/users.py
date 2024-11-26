@@ -164,19 +164,19 @@ def register(
         shm_name = sre_stack.output("context")
         for username in usernames:
             if username in user_dict.keys():
-                user_domain = user_dict[username].split(".")[0]
+                user_domain = user_dict[username]
                 if shm_name not in user_domain:
                     logger.error(
-                        f"Username [green]'{username}'[/green] belongs to SHM context [blue]'{user_domain}'[/blue].\n"
-                        f"SRE [yellow]'{sre_config.name}'[/yellow] belongs to SHM context [blue]'{shm_name}'[/blue].\n"
-                        "The user must belong to the same SHM context as the SRE."
+                        f"User [green]'{username}'[/green]'s principal domain name is [blue]'{user_domain}'[/blue].\n"
+                        f"SRE [yellow]'{sre_config.name}'[/yellow] belongs to SHM domain [blue]'{shm_config.shm.fqdn}'[/blue].\n"
+                        "The user's principal domain name must match the domain of the SRE to be registered."
                     )
                 else:
                     usernames_to_register.append(username)
             else:
                 logger.error(
                     f"Username '{username}' does not belong to this Data Safe Haven deployment."
-                    " Please use 'dsh users add' to create it."
+                    "Please use 'dsh users add' to create this user."
                 )
         users.register(sre_config.name, usernames_to_register)
     except DataSafeHavenError as exc:
