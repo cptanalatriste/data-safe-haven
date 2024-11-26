@@ -20,7 +20,7 @@ These include,
 - package proxy
 - Gitea and Hedgedoc
 
-Logs from all containers are ingested into the [SREs log workspace](#log-workspace).
+Logs from all containers are ingested into the [SRE's log analytics workspace](#log-workspace).
 There are two logs
 
 `ContainerEvents_CL`
@@ -29,3 +29,18 @@ There are two logs
 `ContainerInstanceLog_CL`
 : Container process logs.
 : This is where you can view the output of the containerised applications and will be useful for debugging problems.
+
+## Workspace logs
+
+Logs from all user workspaces are ingested into the [SRE's log analytics workspace](#log-workspace).
+
+There are three logs
+
+`Perf`
+: Usage statistics for individual workspaces, such as percent memory used and percent disk space used
+
+`Syslog`
+: Linux system logs for individual workspaces, useful for debugging problems related to system processes
+
+`Heartbeat`
+: Verification that the Azure Monitoring Agent is present on the workspaces and is able to connect to the [log analytics workspace](#log-workspace)
