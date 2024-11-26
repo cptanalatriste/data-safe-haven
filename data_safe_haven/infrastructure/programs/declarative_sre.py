@@ -183,6 +183,20 @@ class DeclarativeSRE:
             tags=self.tags,
         )
 
+        # Deploy monitoring
+        monitoring = SREMonitoringComponent(
+            "sre_monitoring",
+            self.stack_name,
+            SREMonitoringProps(
+                dns_private_zones=dns.private_zones,
+                location=self.config.azure.location,
+                resource_group_name=resource_group.name,
+                subnet=networking.subnet_monitoring,
+                timezone=self.config.sre.timezone,
+            ),
+            tags=self.tags,
+        )
+
         # Deploy data storage
         data = SREDataComponent(
             "sre_data",
@@ -196,6 +210,7 @@ class DeclarativeSRE:
                 dns_record=networking.shm_ns_record,
                 dns_server_admin_password=dns.password_admin,
                 location=self.config.azure.location,
+                log_analytics_workspace=monitoring.log_analytics,
                 resource_group=resource_group,
                 sre_fqdn=networking.sre_fqdn,
                 storage_quota_gb_home=self.config.sre.storage_quota_gb.home,
@@ -205,20 +220,6 @@ class DeclarativeSRE:
                 subscription_id=self.config.azure.subscription_id,
                 subscription_name=sre_subscription_name,
                 tenant_id=self.config.azure.tenant_id,
-            ),
-            tags=self.tags,
-        )
-
-        # Deploy monitoring
-        monitoring = SREMonitoringComponent(
-            "sre_monitoring",
-            self.stack_name,
-            SREMonitoringProps(
-                dns_private_zones=dns.private_zones,
-                location=self.config.azure.location,
-                resource_group_name=resource_group.name,
-                subnet=networking.subnet_monitoring,
-                timezone=self.config.sre.timezone,
             ),
             tags=self.tags,
         )
