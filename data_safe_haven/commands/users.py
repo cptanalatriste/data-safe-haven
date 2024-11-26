@@ -148,9 +148,7 @@ def register(
         users = UserHandler(context, graph_api)
         available_users = users.entra_users.list()
         user_dict = {
-            user.user_principal_name.split("@")[0]: user.user_principal_name.split("@")[
-                1
-            ]
+            user.preferred_username.split("@")[0]: user.preferred_username.split("@")[1]
             for user in available_users
         }
         usernames_to_register = []
