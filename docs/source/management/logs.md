@@ -7,7 +7,7 @@ Some of these logs are ingested into a central location, an Azure [Log Analytics
 
 Each SRE has its own Log Analytics Workspace.
 You can view the workspaces by going to the Azure portal and navigating to [Log Analytics Workspaces](https://portal.azure.com/#browse/Microsoft.OperationalInsights%2Fworkspaces).
-Select which log workspace you want to view by clicking on the workspace named `shm-<YOUR_SHM_NAME>-sre-<YOUR_SRE_NAME>-log`.
+Select which Log Analytics Workspace you want to view by clicking on the workspace named `shm-<YOUR_SHM_NAME>-sre-<YOUR_SRE_NAME>-log`.
 
 The logs can be filtered using [Kusto Query Language (KQL)](https://learn.microsoft.com/en-us/azure/azure-monitor/logs/log-query-overview).
 
@@ -32,7 +32,7 @@ There are two logs
 
 ## Workspace logs
 
-Logs from all user workspaces are ingested into the [SRE's log analytics workspace](#log-workspace).
+Logs from all user workspaces are ingested into the [SRE's log analytics workspace](#log-workspace) using the [Azure Monitor Agent](https://learn.microsoft.com/en-us/azure/azure-monitor/agents/azure-monitor-agent-overview).
 
 There are three logs
 
@@ -43,4 +43,4 @@ There are three logs
 : Linux system logs for individual workspaces, useful for debugging problems related to system processes
 
 `Heartbeat`
-: Verification that the Azure Monitoring Agent is present on the workspaces and is able to connect to the [log analytics workspace](#log-workspace)
+: Verification that the Azure Monitor Agent is present on the workspaces and is able to connect to the [log analytics workspace](#log-workspace)
