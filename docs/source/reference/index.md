@@ -1,6 +1,18 @@
 # Reference
 
-## `dsh` command line interface
+:::{toctree}
+:hidden:
+
+config.md
+context.md
+users.md
+pulumi.md
+shm.md
+sre.md
+:::
+
+A Data Safe Haven is managed using the `dsh` command line interface.
+A full guide to the commands available for managing your Data Safe Haven is provided here.
 
 The `dsh` commands are the entrypoint to the Data Safe Haven command line interface.
 All commands begin with `dsh`.
@@ -10,66 +22,23 @@ All commands begin with `dsh`.
 :width: 65
 :::
 
-## `config` commands
+The subcommands can be used to manage various aspects of a Data Safe Haven deployment.
+For further detail on each subcommand, navigate to the relevant page.
 
-`config` commands are used to manage the configuration files that define SHMs and SREs.
+[Config](config.md)
+: Management of the configuration files used to define SHMs and SREs
 
-:::{typer} data_safe_haven.commands.config:config_command_group
-:width: 65
-:prog: dsh config
-:show-nested:
-:make-sections:
-:::
+[Context](context.md)
+: Manage DSH contexts, the groupings that encompass an SHM and its associated SREs
 
-## `context` commands
+[Users](users.md)
+: Management of users in Entra ID
 
-`context` commands are used to manage the Data Safe Haven contexts, which are the grouping within which a single SHM and its associated SREs are organised.
+[Pulumi](pulumi.md)
+: An interface to the Pulumi command line interface
 
-:::{typer} data_safe_haven.commands.context:context_command_group
-:width: 65
-:prog: dsh context
-:show-nested:
-:make-sections:
-:::
+[shm](shm.md)
+: Management of infrastructure for DSH Safe Haven Management environments
 
-## `shm` commands
-
-`shm` commands are used to deploy or teardown DSH Safe Haven Management infrastructure
-
-:::{typer} data_safe_haven.commands.shm:shm_command_group
-:width: 65
-:prog: dsh shm
-:show-nested:
-:make-sections:
-:::
-
-## `sre` commands
-
-`sre` commands are used to deploy or teardown the infrastructure for DSH Secure Research Environments
-
-:::{typer} data_safe_haven.commands.sre:sre_command_group
-:width: 65
-:prog: dsh sre
-:show-nested:
-:make-sections:
-:::
-
-## `users` commands
-
-`users` commands are used to manage users on the Entra ID associated with a DSH deployment.
-
-:::{typer} data_safe_haven.commands.users:users_command_group
-:width: 65
-:prog: dsh users
-:show-nested:
-:make-sections:
-:::
-
-## `pulumi` commands
-
-:::{typer} data_safe_haven.commands.pulumi:pulumi_command_group
-:width: 65
-:prog: dsh pulumi
-:show-nested:
-:make-sections:
-:::
+[sre](sre.md)
+: Management of infrastructure for DSH Secure Research Environments
