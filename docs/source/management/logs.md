@@ -46,3 +46,22 @@ There are three logs
 
 `Heartbeat`
 : Verification that the Azure Monitor Agent is present on the workspaces and is able to connect to the [log analytics workspace](#log-workspace).
+
+## Firewall logs
+
+The firewall plays a critical role in the security of a Data Safe Haven.
+It filters all outbound traffic through a set of FQDN rules so that each component may only reach necessary and allowed domains.
+
+Logs from the firewall are ingested into the [SREs log workspace](#log-workspace).
+There are multiple tables,
+
+`AZFWApplicationRule`
+: Logs from the firewalls FDQN filters.
+: Shows requests to the outside of the Data Safe Haven and why they have been approved or rejected.
+
+`AZFWDnsQuery`
+: DNS requests handled by the firewall.
+
+`AzureMetrics`
+: Various metrics on firewall utilisation and performance.
+: This table is not reserved for the firewall and other resources may log to it.
