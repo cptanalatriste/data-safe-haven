@@ -11,6 +11,38 @@ Select which Log Analytics Workspace you want to view by clicking on the workspa
 
 The logs can be filtered using [Kusto Query Language (KQL)](https://learn.microsoft.com/en-us/azure/azure-monitor/logs/log-query-overview).
 
+## Storage logs
+
+Depending on how different parts of Data Safe Haven storage are provisioned, logs may differ.
+
+### Sensitive data logs
+
+The sensitive data containers are the [ingress and egress containers](./data.md).
+Logs from these containers are ingested into the [SRE's log analytics workspace](#log-workspace).
+There are two tables,
+
+`StorageBlobLogs`
+: Events occurring on the blob containers.
+: For example data being uploaded, extracted or read.
+
+`AzureMetrics`
+: Various metrics on blob container utilisation and performance.
+: This table is not reserved for the firewall and other resources may log to it.
+
+### Desired state data logs
+
+The desired state container holds the data necessary to configure virtual machines in an SRE.
+Logs from the desired state container are ingested into the [SRE's log analytics workspace](#log-workspace).
+There are two tables,
+
+`StorageBlobLogs`
+: Events occurring on the blob containers.
+: For example data being uploaded, extracted or read.
+
+`AzureMetrics`
+: Various metrics on blob container utilisation and performance.
+: This table is not reserved for the firewall and other resources may log to it.
+
 ## Container logs
 
 Some of the Data Safe Haven infrastructure is provisioned as containers.
@@ -21,7 +53,7 @@ These include,
 - Gitea and Hedgedoc
 
 Logs from all containers are ingested into the [SRE's log analytics workspace](#log-workspace).
-There are two logs
+There are two tables,
 
 `ContainerEvents_CL`
 : Event logs for the container instance resources such as starting, stopping, crashes and pulling images.
@@ -34,7 +66,7 @@ There are two logs
 
 Logs from all user workspaces are ingested into the [SRE's log analytics workspace](#log-workspace) using the [Azure Monitor Agent](https://learn.microsoft.com/en-us/azure/azure-monitor/agents/azure-monitor-agent-overview).
 
-There are three logs
+There are three tables,
 
 `Perf`
 : Usage statistics for individual workspaces, such as percent memory used and percent disk space used.
@@ -53,7 +85,7 @@ The firewall plays a critical role in the security of a Data Safe Haven.
 It filters all outbound traffic through a set of FQDN rules so that each component may only reach necessary and allowed domains.
 
 Logs from the firewall are ingested into the [SREs log workspace](#log-workspace).
-There are multiple tables,
+There are three tables,
 
 `AZFWApplicationRule`
 : Logs from the firewalls FDQN filters.
