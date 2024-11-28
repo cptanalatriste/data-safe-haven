@@ -40,7 +40,9 @@ There are three logs
 : Usage statistics for individual workspaces, such as percent memory used and percent disk space used.
 
 `Syslog`
-: Linux system logs for individual workspaces, useful for debugging problems related to system processes.
+: [syslog](https://www.paessler.com/it-explained/syslog) events from workspaces.
+: Syslog is the _de facto_ standard protocol for logging on Linux and most applications will log to it.
+: These logs will be useful for debugging problems with the workspace or workspace software.
 
 `Heartbeat`
 : Verification that the Azure Monitor Agent is present on the workspaces and is able to connect to the [log analytics workspace](#log-workspace).
