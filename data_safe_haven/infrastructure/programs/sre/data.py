@@ -550,7 +550,9 @@ class SREDataComponent(ComponentResource):
                 }
             ],
             resource_uri=storage_account_data_private_sensitive.id.apply(
-                lambda resource_id: resource_id + "/blobServices"
+                # This is the URI of the blobServices resource which is automatically
+                # created.
+                lambda resource_id: resource_id + "/blobServices/default"
             ),
             workspace_id=props.log_analytics_workspace.id,
         )
