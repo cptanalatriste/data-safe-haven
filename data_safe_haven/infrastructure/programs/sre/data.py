@@ -7,7 +7,6 @@ import pulumi_random
 from pulumi import ComponentResource, Input, Output, ResourceOptions
 from pulumi_azure_native import (
     authorization,
-    insights,
     keyvault,
     managedidentity,
     network,
@@ -32,10 +31,11 @@ from data_safe_haven.infrastructure.common import (
 from data_safe_haven.infrastructure.components import (
     NFSV3BlobContainerComponent,
     NFSV3BlobContainerProps,
+    NFSV3StorageAccountComponent,
+    NFSV3StorageAccountProps,
     SSLCertificate,
     SSLCertificateProps,
     WrappedLogAnalyticsWorkspace,
-    WrappedNFSV3StorageAccount,
 )
 from data_safe_haven.types import AzureDnsZoneNames, AzureServiceTag
 
@@ -471,19 +471,25 @@ class SREDataComponent(ComponentResource):
         # Deploy sensitive data blob storage account
         # - This holds the /mnt/input and /mnt/output containers that are mounted by workspaces
         # - Azure blobs have worse NFS support but can be accessed with Azure Storage Explorer
-        storage_account_data_private_sensitive = WrappedNFSV3StorageAccount(
+        component_data_private_sensitive = NFSV3StorageAccountComponent(
             f"{self._name}_storage_account_data_private_sensitive",
-            # Storage account names have a maximum of 24 characters
-            account_name=alphanumeric(
-                f"{''.join(truncate_tokens(stack_name.split('-'), 11))}sensitivedata{sha256hash(self._name)}"
-            )[:24],
-            allowed_ip_addresses=data_private_sensitive_ip_addresses,
-            allowed_service_tag=data_private_sensitive_service_tag,
-            location=props.location,
-            subnet_id=props.subnet_data_private_id,
-            resource_group_name=props.resource_group_name,
+            NFSV3StorageAccountProps(
+                # Storage account names have a maximum of 24 characters
+                account_name=alphanumeric(
+                    f"{''.join(truncate_tokens(stack_name.split('-'), 11))}sensitivedata{sha256hash(self._name)}"
+                )[:24],
+                allowed_ip_addresses=data_private_sensitive_ip_addresses,
+                allowed_service_tag=data_private_sensitive_service_tag,
+                location=props.location,
+                log_analytics_workspace=props.log_analytics_workspace,
+                subnet_id=props.subnet_data_private_id,
+                resource_group_name=props.resource_group_name,
+            ),
             opts=child_opts,
             tags=child_tags,
+        )
+        storage_account_data_private_sensitive = (
+            component_data_private_sensitive.storage_account
         )
         # Deploy storage containers
         NFSV3BlobContainerComponent(
@@ -515,46 +521,6 @@ class SREDataComponent(ComponentResource):
                 storage_account=storage_account_data_private_sensitive,
                 subscription_name=props.subscription_name,
             ),
-        )
-        # Add diagnostic setting for blobs
-        insights.DiagnosticSetting(
-            f"{storage_account_data_private_sensitive._name}_diagnostic_setting",
-            name=f"{storage_account_data_private_sensitive._name}_diagnostic_setting",
-            log_analytics_destination_type="Dedicated",
-            logs=[
-                {
-                    "category_group": "allLogs",
-                    "enabled": True,
-                    "retention_policy": {
-                        "days": 0,
-                        "enabled": False,
-                    },
-                },
-                {
-                    "category_group": "audit",
-                    "enabled": True,
-                    "retention_policy": {
-                        "days": 0,
-                        "enabled": False,
-                    },
-                },
-            ],
-            metrics=[
-                {
-                    "category": "Transaction",
-                    "enabled": True,
-                    "retention_policy": {
-                        "days": 0,
-                        "enabled": False,
-                    },
-                }
-            ],
-            resource_uri=storage_account_data_private_sensitive.id.apply(
-                # This is the URI of the blobServices resource which is automatically
-                # created.
-                lambda resource_id: resource_id + "/blobServices/default"
-            ),
-            workspace_id=props.log_analytics_workspace.id,
         )
         # Set up a private endpoint for the sensitive data storage account
         storage_account_data_private_sensitive_endpoint = network.PrivateEndpoint(
