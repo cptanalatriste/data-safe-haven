@@ -211,6 +211,7 @@ class DeclarativeSRE:
                 dns_record=networking.shm_ns_record,
                 dns_server_admin_password=dns.password_admin,
                 location=self.config.azure.location,
+                log_analytics_workspace=monitoring.log_analytics,
                 resource_group=resource_group,
                 sre_fqdn=networking.sre_fqdn,
                 storage_quota_gb_home=self.config.sre.storage_quota_gb.home,
