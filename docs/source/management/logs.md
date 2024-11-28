@@ -37,10 +37,10 @@ Logs from all user workspaces are ingested into the [SRE's log analytics workspa
 There are three logs
 
 `Perf`
-: Usage statistics for individual workspaces, such as percent memory used and percent disk space used
+: Usage statistics for individual workspaces, such as percent memory used and percent disk space used.
 
 `Syslog`
-: Linux system logs for individual workspaces, useful for debugging problems related to system processes
+: Linux system logs for individual workspaces, useful for debugging problems related to system processes.
 
 `Heartbeat`
-: Verification that the Azure Monitor Agent is present on the workspaces and is able to connect to the [log analytics workspace](#log-workspace)
+: Verification that the Azure Monitor Agent is present on the workspaces and is able to connect to the [log analytics workspace](#log-workspace).
