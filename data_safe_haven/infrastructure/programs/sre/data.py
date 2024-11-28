@@ -425,6 +425,47 @@ class SREDataComponent(ComponentResource):
                 resource_group_name=kwargs["resource_group_name"],
             )
         )
+        # Add diagnostic setting for files
+        insights.DiagnosticSetting(
+            f"{storage_account_data_configuration._name}_diagnostic_setting",
+            name=f"{storage_account_data_configuration._name}_diagnostic_setting",
+            log_analytics_destination_type="Dedicated",
+            logs=[
+                {
+                    "category_group": "allLogs",
+                    "enabled": True,
+                    "retention_policy": {
+                        "days": 0,
+                        "enabled": False,
+                    },
+                },
+                {
+                    "category_group": "audit",
+                    "enabled": True,
+                    "retention_policy": {
+                        "days": 0,
+                        "enabled": False,
+                    },
+                },
+            ],
+            metrics=[
+                {
+                    "category": "Transaction",
+                    "enabled": True,
+                    "retention_policy": {
+                        "days": 0,
+                        "enabled": False,
+                    },
+                }
+            ],
+            resource_uri=storage_account_data_configuration.id.apply(
+                # This is the URI of the fileService resource which is automatically
+                # created.
+                lambda resource_id: resource_id
+                + "/fileServices/default"
+            ),
+            workspace_id=props.log_analytics_workspace.id,
+        )
         # Set up a private endpoint for the configuration data storage account
         storage_account_data_configuration_private_endpoint = network.PrivateEndpoint(
             f"{storage_account_data_configuration._name}_private_endpoint",
