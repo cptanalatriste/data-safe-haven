@@ -163,12 +163,27 @@ class DeclarativeSRE:
             ),
         )
 
+        # Deploy monitoring
+        monitoring = SREMonitoringComponent(
+            "sre_monitoring",
+            self.stack_name,
+            SREMonitoringProps(
+                dns_private_zones=dns.private_zones,
+                location=self.config.azure.location,
+                resource_group_name=resource_group.name,
+                subnet=networking.subnet_monitoring,
+                timezone=self.config.sre.timezone,
+            ),
+            tags=self.tags,
+        )
+
         # Deploy SRE firewall
         SREFirewallComponent(
             "sre_firewall",
             self.stack_name,
             SREFirewallProps(
                 location=self.config.azure.location,
+                log_analytics_workspace=monitoring.log_analytics,
                 resource_group_name=resource_group.name,
                 route_table_name=networking.route_table_name,
                 subnet_apt_proxy_server=networking.subnet_apt_proxy_server,
@@ -205,20 +220,6 @@ class DeclarativeSRE:
                 subscription_id=self.config.azure.subscription_id,
                 subscription_name=sre_subscription_name,
                 tenant_id=self.config.azure.tenant_id,
-            ),
-            tags=self.tags,
-        )
-
-        # Deploy monitoring
-        monitoring = SREMonitoringComponent(
-            "sre_monitoring",
-            self.stack_name,
-            SREMonitoringProps(
-                dns_private_zones=dns.private_zones,
-                location=self.config.azure.location,
-                resource_group_name=resource_group.name,
-                subnet=networking.subnet_monitoring,
-                timezone=self.config.sre.timezone,
             ),
             tags=self.tags,
         )

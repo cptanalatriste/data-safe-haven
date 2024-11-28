@@ -21,7 +21,7 @@ These include,
 - Gitea and Hedgedoc
 
 Logs from all containers are ingested into the [SREs log workspace](#log-workspace).
-There are two logs
+There are two tables,
 
 `ContainerEvents_CL`
 : Event logs for the container instance resources such as starting, stopping, crashes and pulling images.
@@ -29,3 +29,22 @@ There are two logs
 `ContainerInstanceLog_CL`
 : Container process logs.
 : This is where you can view the output of the containerised applications and will be useful for debugging problems.
+
+## Firewall logs
+
+The firewall plays a critical role in the security of a Data Safe Haven.
+It filters all outbound traffic through a set of FQDN rules so that each component may only reach necessary and allowed domains.
+
+Logs from the firewall are ingested into the [SREs log workspace](#log-workspace).
+There are multiple tables,
+
+`AZFWApplicationRule`
+: Logs from the firewalls FDQN filters.
+: Shows requests to the outside of the Data Safe Haven and why they have been approved or rejected.
+
+`AZFWDnsQuery`
+: DNS requests handled by the firewall.
+
+`AzureMetrics`
+: Various metrics on firewall utilisation and performance.
+: This table is not reserved for the firewall and other resources may log to it.
