@@ -153,8 +153,7 @@ def register(
         }
         usernames_to_register = []
         for username in usernames:
-            if username in user_dict.keys():
-                user_domain = user_dict[username]
+            if user_domain:=user_dict.get(username)
                 if shm_config.shm.fqdn not in user_domain:
                     logger.error(
                         f"User [green]'{username}'[/green]'s principal domain name is [blue]'{user_domain}'[/blue].\n"
