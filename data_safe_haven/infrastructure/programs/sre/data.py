@@ -459,12 +459,8 @@ class SREDataComponent(ComponentResource):
                     },
                 }
             ],
-            resource_uri=storage_account_data_configuration.id.apply(
-                # This is the URI of the fileService resource which is automatically
-                # created.
-                lambda resource_id: resource_id
-                + "/fileServices/default"
-            ),
+            # This is the URI of the automatically created fileService resource
+            resource_uri=Output.concat(storage_account_data_configuration.id, "/fileServices/default"),
             workspace_id=props.log_analytics_workspace.id,
         )
         # Set up a private endpoint for the configuration data storage account
@@ -700,12 +696,8 @@ class SREDataComponent(ComponentResource):
                     },
                 }
             ],
-            resource_uri=storage_account_data_private_user.id.apply(
-                # This is the URI of the fileServices resource which is automatically
-                # created.
-                lambda resource_id: resource_id
-                + "/fileServices/default"
-            ),
+            # This is the URI of the automatically created fileService resource
+            resource_uri=Output.concat(storage_account_data_private_user.id, "/fileServices/default"),
             workspace_id=props.log_analytics_workspace.id,
         )
         storage.FileShare(
