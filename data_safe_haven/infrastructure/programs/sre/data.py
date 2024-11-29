@@ -31,9 +31,11 @@ from data_safe_haven.infrastructure.common import (
 from data_safe_haven.infrastructure.components import (
     NFSV3BlobContainerComponent,
     NFSV3BlobContainerProps,
+    NFSV3StorageAccountComponent,
+    NFSV3StorageAccountProps,
     SSLCertificate,
     SSLCertificateProps,
-    WrappedNFSV3StorageAccount,
+    WrappedLogAnalyticsWorkspace,
 )
 from data_safe_haven.types import AzureDnsZoneNames, AzureServiceTag
 
@@ -51,6 +53,7 @@ class SREDataProps:
         dns_record: Input[network.RecordSet],
         dns_server_admin_password: Input[pulumi_random.RandomPassword],
         location: Input[str],
+        log_analytics_workspace: Input[WrappedLogAnalyticsWorkspace],
         resource_group: Input[resources.ResourceGroup],
         sre_fqdn: Input[str],
         storage_quota_gb_home: Input[int],
@@ -69,6 +72,7 @@ class SREDataProps:
         self.dns_record = dns_record
         self.password_dns_server_admin = dns_server_admin_password
         self.location = location
+        self.log_analytics_workspace = log_analytics_workspace
         self.resource_group_id = Output.from_input(resource_group).apply(get_id_from_rg)
         self.resource_group_name = Output.from_input(resource_group).apply(
             get_name_from_rg
@@ -467,19 +471,25 @@ class SREDataComponent(ComponentResource):
         # Deploy sensitive data blob storage account
         # - This holds the /mnt/input and /mnt/output containers that are mounted by workspaces
         # - Azure blobs have worse NFS support but can be accessed with Azure Storage Explorer
-        storage_account_data_private_sensitive = WrappedNFSV3StorageAccount(
+        component_data_private_sensitive = NFSV3StorageAccountComponent(
             f"{self._name}_storage_account_data_private_sensitive",
-            # Storage account names have a maximum of 24 characters
-            account_name=alphanumeric(
-                f"{''.join(truncate_tokens(stack_name.split('-'), 11))}sensitivedata{sha256hash(self._name)}"
-            )[:24],
-            allowed_ip_addresses=data_private_sensitive_ip_addresses,
-            allowed_service_tag=data_private_sensitive_service_tag,
-            location=props.location,
-            subnet_id=props.subnet_data_private_id,
-            resource_group_name=props.resource_group_name,
+            NFSV3StorageAccountProps(
+                # Storage account names have a maximum of 24 characters
+                account_name=alphanumeric(
+                    f"{''.join(truncate_tokens(stack_name.split('-'), 11))}sensitivedata{sha256hash(self._name)}"
+                )[:24],
+                allowed_ip_addresses=data_private_sensitive_ip_addresses,
+                allowed_service_tag=data_private_sensitive_service_tag,
+                location=props.location,
+                log_analytics_workspace=props.log_analytics_workspace,
+                subnet_id=props.subnet_data_private_id,
+                resource_group_name=props.resource_group_name,
+            ),
             opts=child_opts,
             tags=child_tags,
+        )
+        storage_account_data_private_sensitive = (
+            component_data_private_sensitive.storage_account
         )
         # Deploy storage containers
         NFSV3BlobContainerComponent(
