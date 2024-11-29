@@ -27,7 +27,7 @@ There are two tables,
 
 `AzureMetrics`
 : Various metrics on blob container utilisation and performance.
-: This table is not reserved for the firewall and other resources may log to it.
+: This table is not reserved for the sensitive data containers and other resources may log to it.
 
 ### Desired state data logs
 
@@ -41,7 +41,7 @@ There are two tables,
 
 `AzureMetrics`
 : Various metrics on blob container utilisation and performance.
-: This table is not reserved for the firewall and other resources may log to it.
+: This table is not reserved for the desired state data container and other resources may log to it.
 
 ### User data logs
 
