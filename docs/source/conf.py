@@ -5,9 +5,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 import datetime
 import emoji
-import sys
-import os
-sys.path.insert(0, os.path.abspath(os.path.join("..", "..")))
+
 
 # -- Project information -----------------------------------------------------
 
