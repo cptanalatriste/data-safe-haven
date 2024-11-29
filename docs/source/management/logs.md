@@ -43,6 +43,35 @@ There are two tables,
 : Various metrics on blob container utilisation and performance.
 : This table is not reserved for the firewall and other resources may log to it.
 
+### User data logs
+
+The user data file share holds the {ref}`role_researcher`s' [home directories](https://refspecs.linuxfoundation.org/FHS_3.0/fhs/ch03s08.html), where they will store their personal data and configuration.
+Logs from the share are ingested into the [SRE's log analytics workspace](#log-workspace).
+There are two tables,
+
+`StorageFileLogs`
+: NFS events occurring on the file share.
+: For example data being written or directories being accessed
+
+`AzureMetrics`
+: Various metrics on file share utilisation and performance.
+: This table is not reserved for the user data share and other resources may log to it.
+
+### Configuration data logs
+
+There are multiple configuration data file shares.
+Each contains the configuration and state data for the Data Safe Haven [services deployed as containers](#container-logs).
+Logs from the share are ingested into the [SRE's log analytics workspace](#log-workspace).
+There are two tables,
+
+`StorageFileLogs`
+: SMB events occurring on the file share.
+: For example data being written or directories being accessed
+
+`AzureMetrics`
+: Various metrics on file share utilisation and performance.
+: This table is not reserved for the configuration data shares and other resources may log to it.
+
 ## Container logs
 
 Some of the Data Safe Haven infrastructure is provisioned as containers.
