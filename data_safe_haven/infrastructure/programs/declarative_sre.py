@@ -168,6 +168,7 @@ class DeclarativeSRE:
             "sre_firewall",
             self.stack_name,
             SREFirewallProps(
+                allow_workspace_internet=self.config.sre.allow_workspace_internet,
                 location=self.config.azure.location,
                 resource_group_name=resource_group.name,
                 route_table_name=networking.route_table_name,

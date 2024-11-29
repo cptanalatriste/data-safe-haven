@@ -75,3 +75,59 @@ def subnet_guacamole_containers() -> network.GetSubnetResult:
         address_prefix=SREIpRanges.guacamole_containers.prefix,
         id="subnet_guacamole_containers_id",
     )
+
+
+@fixture
+def subnet_apt_proxy_server() -> network.GetSubnetResult:
+    return network.GetSubnetResult(
+        address_prefix=SREIpRanges.apt_proxy_server.prefix,
+        id="subnet_apt_proxy_server_id",
+    )
+
+
+@fixture
+def subnet_clamav_mirror() -> network.GetSubnetResult:
+    return network.GetSubnetResult(
+        address_prefix=SREIpRanges.clamav_mirror.prefix,
+        id="subnet_clamav_mirror_id",
+    )
+
+
+@fixture
+def subnet_firewall() -> network.GetSubnetResult:
+    return network.GetSubnetResult(
+        address_prefix=SREIpRanges.firewall.prefix,
+        id="subnet_firewall_id",
+    )
+
+
+@fixture
+def subnet_firewall_management() -> network.GetSubnetResult:
+    return network.GetSubnetResult(
+        address_prefix=SREIpRanges.firewall_management.prefix,
+        id="subnet_firewall_management_id",
+    )
+
+
+@fixture
+def subnet_identity_containers() -> network.GetSubnetResult:
+    return network.GetSubnetResult(
+        address_prefix=SREIpRanges.identity_containers.prefix,
+        id="subnet_identity_containers_id",
+    )
+
+
+@fixture
+def subnet_user_services_software_repositories() -> network.GetSubnetResult:
+    return network.GetSubnetResult(
+        address_prefix=SREIpRanges.user_services_software_repositories.prefix,
+        id="subnet_user_services_software_repositories_id",
+    )
+
+
+@fixture
+def subnet_workspaces() -> network.GetSubnetResult:
+    return network.GetSubnetResult(
+        address_prefix=SREIpRanges.subnet_workspaces.prefix,
+        id="subnet_workspaces_id",
+    )
