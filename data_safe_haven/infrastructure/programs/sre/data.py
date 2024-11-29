@@ -7,6 +7,7 @@ import pulumi_random
 from pulumi import ComponentResource, Input, Output, ResourceOptions
 from pulumi_azure_native import (
     authorization,
+    insights,
     keyvault,
     managedidentity,
     network,
@@ -425,6 +426,45 @@ class SREDataComponent(ComponentResource):
                 resource_group_name=kwargs["resource_group_name"],
             )
         )
+        # Add diagnostic setting for files
+        insights.DiagnosticSetting(
+            f"{storage_account_data_configuration._name}_diagnostic_setting",
+            name=f"{storage_account_data_configuration._name}_diagnostic_setting",
+            log_analytics_destination_type="Dedicated",
+            logs=[
+                {
+                    "category_group": "allLogs",
+                    "enabled": True,
+                    "retention_policy": {
+                        "days": 0,
+                        "enabled": False,
+                    },
+                },
+                {
+                    "category_group": "audit",
+                    "enabled": True,
+                    "retention_policy": {
+                        "days": 0,
+                        "enabled": False,
+                    },
+                },
+            ],
+            metrics=[
+                {
+                    "category": "Transaction",
+                    "enabled": True,
+                    "retention_policy": {
+                        "days": 0,
+                        "enabled": False,
+                    },
+                }
+            ],
+            # This is the URI of the automatically created fileService resource
+            resource_uri=Output.concat(
+                storage_account_data_configuration.id, "/fileServices/default"
+            ),
+            workspace_id=props.log_analytics_workspace.id,
+        )
         # Set up a private endpoint for the configuration data storage account
         storage_account_data_configuration_private_endpoint = network.PrivateEndpoint(
             f"{storage_account_data_configuration._name}_private_endpoint",
@@ -624,6 +664,45 @@ class SREDataComponent(ComponentResource):
             sku=storage.SkuArgs(name=storage.SkuName.PREMIUM_ZRS),
             opts=child_opts,
             tags=child_tags,
+        )
+        # Add diagnostic setting for files
+        insights.DiagnosticSetting(
+            f"{storage_account_data_private_user._name}_diagnostic_setting",
+            name=f"{storage_account_data_private_user._name}_diagnostic_setting",
+            log_analytics_destination_type="Dedicated",
+            logs=[
+                {
+                    "category_group": "allLogs",
+                    "enabled": True,
+                    "retention_policy": {
+                        "days": 0,
+                        "enabled": False,
+                    },
+                },
+                {
+                    "category_group": "audit",
+                    "enabled": True,
+                    "retention_policy": {
+                        "days": 0,
+                        "enabled": False,
+                    },
+                },
+            ],
+            metrics=[
+                {
+                    "category": "Transaction",
+                    "enabled": True,
+                    "retention_policy": {
+                        "days": 0,
+                        "enabled": False,
+                    },
+                }
+            ],
+            # This is the URI of the automatically created fileService resource
+            resource_uri=Output.concat(
+                storage_account_data_private_user.id, "/fileServices/default"
+            ),
+            workspace_id=props.log_analytics_workspace.id,
         )
         storage.FileShare(
             f"{storage_account_data_private_user._name}_files_home",
