@@ -108,6 +108,38 @@ class SREFirewallComponent(ComponentResource):
             tags=child_tags,
         )
 
+        # TODO: Check how to better implement this.
+        # Add allow_workspace_internet boolean config.
+        if props.allow_workspace_internet:
+            workspace_deny_firewall_collection = network.AzureFirewallApplicationRuleCollectionArgs(
+                        action=network.AzureFirewallRCActionArgs(
+                            type=network.AzureFirewallRCActionType.DENY
+                        ),
+                        name="workspaces-deny",
+                        priority=FirewallPriorities.SRE_WORKSPACES_DENY,
+                        rules=[
+                            network.AzureFirewallApplicationRuleArgs(
+                                description="Deny external Ubuntu Snap Store upload and login access",
+                                name="DenyUbuntuSnapcraft",
+                                protocols=[
+                                    network.AzureFirewallApplicationRuleProtocolArgs(
+                                        port=int(Ports.HTTP),
+                                        protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTP,
+                                    ),
+                                    network.AzureFirewallApplicationRuleProtocolArgs(
+                                        port=int(Ports.HTTPS),
+                                        protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTPS,
+                                    ),
+                                ],
+                                source_addresses=props.subnet_workspaces_prefixes,
+                                target_fqdns=ForbiddenDomains.UBUNTU_SNAPCRAFT,
+                            ),
+                        ],
+                    )
+        else:
+            workspace_deny_firewall_collection = None
+            
+
         # Deploy firewall
         firewall = network.AzureFirewall(
             f"{self._name}_firewall",
@@ -282,31 +314,7 @@ class SREFirewallComponent(ComponentResource):
                         ),
                     ],
                 ),
-                network.AzureFirewallApplicationRuleCollectionArgs(
-                    action=network.AzureFirewallRCActionArgs(
-                        type=network.AzureFirewallRCActionType.DENY
-                    ),
-                    name="workspaces-deny",
-                    priority=FirewallPriorities.SRE_WORKSPACES_DENY,
-                    rules=[
-                        network.AzureFirewallApplicationRuleArgs(
-                            description="Deny external Ubuntu Snap Store upload and login access",
-                            name="DenyUbuntuSnapcraft",
-                            protocols=[
-                                network.AzureFirewallApplicationRuleProtocolArgs(
-                                    port=int(Ports.HTTP),
-                                    protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTP,
-                                ),
-                                network.AzureFirewallApplicationRuleProtocolArgs(
-                                    port=int(Ports.HTTPS),
-                                    protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTPS,
-                                ),
-                            ],
-                            source_addresses=props.subnet_workspaces_prefixes,
-                            target_fqdns=ForbiddenDomains.UBUNTU_SNAPCRAFT,
-                        ),
-                    ],
-                ),
+                workspace_deny_firewall_collection,
             ],
             azure_firewall_name=f"{stack_name}-firewall",
             ip_configurations=[
