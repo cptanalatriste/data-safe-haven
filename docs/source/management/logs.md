@@ -45,7 +45,7 @@ There are two tables,
 
 ### User data logs
 
-The user data file share holds the {ref}`role_researcher`s' [home directories](https://refspecs.linuxfoundation.org/FHS_3.0/fhs/ch03s08.html), where they will store their personal data and configuration.
+The user data file share holds the {ref}`researchers'<role_researcher>` [home directories](https://refspecs.linuxfoundation.org/FHS_3.0/fhs/ch03s08.html), where they will store their personal data and configuration.
 Logs from the share are ingested into the [SRE's log analytics workspace](#log-workspace).
 There are two tables,
 
