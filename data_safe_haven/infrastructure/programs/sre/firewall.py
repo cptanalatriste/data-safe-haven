@@ -110,11 +110,8 @@ class SREFirewallComponent(ComponentResource):
             tags=child_tags,
         )
 
-        # TODO: Check how to better implement this.
-        # Add allow_workspace_internet boolean config.
-
         # Deploy firewall
-        firewall = network.AzureFirewall(
+        self.firewall = network.AzureFirewall(
             f"{self._name}_firewall",
             application_rule_collections=self._get_application_rule_collections(props),
             azure_firewall_name=f"{stack_name}-firewall",
@@ -141,7 +138,7 @@ class SREFirewallComponent(ComponentResource):
         )
 
         # Retrieve the private IP address for the firewall
-        private_ip_address = firewall.ip_configurations.apply(
+        private_ip_address = self.firewall.ip_configurations.apply(
             lambda cfgs: "" if not cfgs else cfgs[0].private_ip_address
         )
 
@@ -160,7 +157,7 @@ class SREFirewallComponent(ComponentResource):
             resource_group_name=props.resource_group_name,
             route_name="ViaFirewall",
             route_table_name=props.route_table_name,
-            opts=ResourceOptions.merge(child_opts, ResourceOptions(parent=firewall)),
+            opts=ResourceOptions.merge(child_opts, ResourceOptions(parent=self.firewall)),
         )
 
     def _get_application_rule_collections(

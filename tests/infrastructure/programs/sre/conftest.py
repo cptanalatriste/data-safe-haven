@@ -128,6 +128,6 @@ def subnet_user_services_software_repositories() -> network.GetSubnetResult:
 @fixture
 def subnet_workspaces() -> network.GetSubnetResult:
     return network.GetSubnetResult(
-        address_prefix=SREIpRanges.subnet_workspaces.prefix,
+        address_prefix=SREIpRanges.workspaces.prefix,
         id="subnet_workspaces_id",
     )
