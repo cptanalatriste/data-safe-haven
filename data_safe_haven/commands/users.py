@@ -5,6 +5,7 @@ from typing import Annotated
 
 import typer
 
+from data_safe_haven import console
 from data_safe_haven.administration.users import UserHandler
 from data_safe_haven.config import ContextManager, DSHPulumiConfig, SHMConfig, SREConfig
 from data_safe_haven.exceptions import DataSafeHavenError
@@ -155,18 +156,20 @@ def register(
         for username in usernames:
             if user_domain := user_dict.get(username):
                 if shm_config.shm.fqdn not in user_domain:
+                    console.print(
+                        f"User [green]'{username}[/green]'s principal domain name is [blue]'{user_domain}'[/blue].\n"
+                        f"SRE [yellow]'{sre}'[/yellow] belongs to SHM domain [blue]'{shm_config.shm.fqdn}'[/blue]."
+                    )
                     logger.error(
-                        f"User [green]'{username}'[/green]'s principal domain name is [blue]'{user_domain}'[/blue].\n"
-                        f"SRE [yellow]'{sre}'[/yellow] belongs to SHM domain [blue]'{shm_config.shm.fqdn}'[/blue].\n"
                         "The user's principal domain name must match the domain of the SRE to be registered."
                     )
                 else:
                     usernames_to_register.append(username)
             else:
                 logger.error(
-                    f"Username '{username}' does not belong to this Data Safe Haven deployment.\n"
-                    "Please use 'dsh users add' to create this user."
+                    f"Username '{username}' does not belong to this Data Safe Haven deployment."
                 )
+                console.print("Please use 'dsh users add' to create this user.")
         users.register(sre_config.name, usernames_to_register)
     except DataSafeHavenError as exc:
         logger.critical(f"Could not register Data Safe Haven users with SRE '{sre}'.")
@@ -270,8 +273,8 @@ def unregister(
             else:
                 logger.error(
                     f"Username '{username}' does not belong to this Data Safe Haven deployment."
-                    " Please use 'dsh users add' to create it."
                 )
+                console.print("Please use 'dsh users add' to create it.")
         for group_name in (
             f"{sre_config.name} Users",
             f"{sre_config.name} Privileged Users",
