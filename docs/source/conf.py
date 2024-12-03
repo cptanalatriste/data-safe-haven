@@ -5,7 +5,9 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 import datetime
 import emoji
-
+from pathlib import Path
+import sys
+sys.path.insert(0, Path(__file__).parent.parent.absolute())
 
 # -- Project information -----------------------------------------------------
 
