@@ -7,25 +7,27 @@ import pulumi.runtime
 import pytest
 from pulumi_azure_native import network
 
+from data_safe_haven.infrastructure.programs.sre.firewall import (
+    SREFirewallComponent,
+    SREFirewallProps,
+)
+
 from ..resource_assertions import assert_equal
 
 
 class MyMocks(pulumi.runtime.Mocks):
     def new_resource(self, args: pulumi.runtime.MockResourceArgs):
-        return [args.name + "_id", args.inputs]
+        resources = [args.name + "_id", args.inputs]
+        return resources
 
     def call(self, _: pulumi.runtime.MockCallArgs):
         return {}
 
 
+# TODO: These breaks many other tests!
 pulumi.runtime.set_mocks(
     MyMocks(),
-    preview=False,  # Sets the flag `dry_run`, which is true at runtime during a preview.
-)
-
-from data_safe_haven.infrastructure.programs.sre.firewall import (
-    SREFirewallComponent,
-    SREFirewallProps,
+    preview=False,
 )
 
 
@@ -168,5 +170,6 @@ class TestSREFirewallComponent:
                 assert not workspace_deny_collection
             else:
                 assert len(workspace_deny_collection) == 1
+
         else:
             raise AssertionError()
