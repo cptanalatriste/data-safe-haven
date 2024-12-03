@@ -197,7 +197,7 @@ pytest-ansible==24.9.0
     #   tox-ansible
 pytest-xdist==3.6.1
     # via tox-ansible
-python-daemon==3.1.1
+python-daemon==3.1.2
     # via ansible-runner
 python-gnupg==0.5.3
     # via ansible-sign
@@ -225,7 +225,7 @@ rich==13.9.4
     #   ansible-lint
     #   enrich
     #   molecule
-rpds-py==0.21.0
+rpds-py==0.22.1
     # via
     #   jsonschema
     #   referencing
