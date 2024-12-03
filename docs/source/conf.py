@@ -7,7 +7,7 @@ import datetime
 import emoji
 from pathlib import Path
 import sys
-sys.path.insert(0, Path(__file__).parents[2].absolute())
+sys.path.insert(0, Path(__file__).parents[1].absolute())
 print(sys.path)
 
 # -- Project information -----------------------------------------------------
