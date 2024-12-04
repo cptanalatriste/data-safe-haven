@@ -22,7 +22,8 @@ class SREFirewallProps:
 
     def __init__(
         self,
-        allow_workspace_internet: Input[bool],
+        *,
+        allow_workspace_internet: bool,
         location: Input[str],
         resource_group_name: Input[str],
         route_table_name: Input[str],
@@ -110,59 +111,6 @@ class SREFirewallComponent(ComponentResource):
             tags=child_tags,
         )
 
-        # Deploy firewall
-        self.firewall = network.AzureFirewall(
-            f"{self._name}_firewall",
-            application_rule_collections=self._get_application_rule_collections(props),
-            azure_firewall_name=f"{stack_name}-firewall",
-            ip_configurations=[
-                network.AzureFirewallIPConfigurationArgs(
-                    name="FirewallIpConfiguration",
-                    public_ip_address=network.SubResourceArgs(id=public_ip.id),
-                    subnet=network.SubResourceArgs(id=props.subnet_firewall_id),
-                )
-            ],
-            location=props.location,
-            management_ip_configuration=network.AzureFirewallIPConfigurationArgs(
-                name="FirewallManagementIpConfiguration",
-                public_ip_address=network.SubResourceArgs(id=public_ip_management.id),
-                subnet=network.SubResourceArgs(id=props.subnet_firewall_management_id),
-            ),
-            resource_group_name=props.resource_group_name,
-            sku=network.AzureFirewallSkuArgs(
-                name=network.AzureFirewallSkuName.AZF_W_V_NET,
-                tier=network.AzureFirewallSkuTier.BASIC,
-            ),
-            opts=child_opts,
-            tags=child_tags,
-        )
-
-        # Retrieve the private IP address for the firewall
-        private_ip_address = self.firewall.ip_configurations.apply(
-            lambda cfgs: "" if not cfgs else cfgs[0].private_ip_address
-        )
-
-        # Route all external traffic through the firewall.
-        #
-        # We use the system default route "0.0.0.0/0" as this will be overruled by
-        # anything more specific, such as VNet <-> VNet traffic which we do not want to
-        # send via the firewall.
-        #
-        # See https://learn.microsoft.com/en-us/azure/virtual-network/virtual-networks-udr-overview
-        network.Route(
-            f"{self._name}_route_via_firewall",
-            address_prefix="0.0.0.0/0",
-            next_hop_ip_address=private_ip_address,
-            next_hop_type=network.RouteNextHopType.VIRTUAL_APPLIANCE,
-            resource_group_name=props.resource_group_name,
-            route_name="ViaFirewall",
-            route_table_name=props.route_table_name,
-            opts=ResourceOptions.merge(child_opts, ResourceOptions(parent=self.firewall)),
-        )
-
-    def _get_application_rule_collections(
-        self, props: SREFirewallProps
-    ) -> list[network.AzureFirewallApplicationRuleCollectionArgs]:
         application_rule_collections: list[
             network.AzureFirewallApplicationRuleCollectionArgs
         ] = [
@@ -336,34 +284,108 @@ class SREFirewallComponent(ComponentResource):
                     ),
                 ],
             ),
+            network.AzureFirewallApplicationRuleCollectionArgs(
+                action=network.AzureFirewallRCActionArgs(
+                    type=network.AzureFirewallRCActionType.DENY
+                ),
+                name="workspaces-deny",
+                priority=FirewallPriorities.SRE_WORKSPACES_DENY,
+                rules=[
+                    network.AzureFirewallApplicationRuleArgs(
+                        description="Deny external Ubuntu Snap Store upload and login access",
+                        name="DenyUbuntuSnapcraft",
+                        protocols=[
+                            network.AzureFirewallApplicationRuleProtocolArgs(
+                                port=int(Ports.HTTP),
+                                protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTP,
+                            ),
+                            network.AzureFirewallApplicationRuleProtocolArgs(
+                                port=int(Ports.HTTPS),
+                                protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTPS,
+                            ),
+                        ],
+                        source_addresses=props.subnet_workspaces_prefixes,
+                        target_fqdns=ForbiddenDomains.UBUNTU_SNAPCRAFT,
+                    ),
+                ],
+            ),
         ]
 
-        if not props.allow_workspace_internet:
-            application_rule_collections.append(
-                network.AzureFirewallApplicationRuleCollectionArgs(
+        network_rule_collections: list[
+            network.AzureFirewallNetworkRuleCollectionArgs
+        ] = []
+
+        if props.allow_workspace_internet:
+            application_rule_collections = []
+            network_rule_collections.append(
+                network.AzureFirewallNetworkRuleCollectionArgs(
                     action=network.AzureFirewallRCActionArgs(
-                        type=network.AzureFirewallRCActionType.DENY
+                        type=network.AzureFirewallRCActionType.ALLOW
                     ),
-                    name="workspaces-deny",
-                    priority=FirewallPriorities.SRE_WORKSPACES_DENY,
+                    name="workspaces-all-allow",  # TODO: Fix other names.
+                    priority=FirewallPriorities.SRE_WORKSPACES,
                     rules=[
-                        network.AzureFirewallApplicationRuleArgs(
-                            description="Deny external Ubuntu Snap Store upload and login access",
-                            name="DenyUbuntuSnapcraft",
-                            protocols=[
-                                network.AzureFirewallApplicationRuleProtocolArgs(
-                                    port=int(Ports.HTTP),
-                                    protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTP,
-                                ),
-                                network.AzureFirewallApplicationRuleProtocolArgs(
-                                    port=int(Ports.HTTPS),
-                                    protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTPS,
-                                ),
-                            ],
+                        network.AzureFirewallNetworkRuleArgs(
+                            description="Enables internet access to workspaces.",
+                            destination_addresses=["*"],
+                            destination_ports=["*"],
+                            name="allow-internet-access",
+                            protocols=[network.AzureFirewallNetworkRuleProtocol.ANY],
                             source_addresses=props.subnet_workspaces_prefixes,
-                            target_fqdns=ForbiddenDomains.UBUNTU_SNAPCRAFT,
-                        ),
+                        )
                     ],
                 )
             )
-        return application_rule_collections
+
+        # Deploy firewall
+        self.firewall = network.AzureFirewall(
+            f"{self._name}_firewall",
+            application_rule_collections=application_rule_collections,
+            azure_firewall_name=f"{stack_name}-firewall",
+            ip_configurations=[
+                network.AzureFirewallIPConfigurationArgs(
+                    name="FirewallIpConfiguration",
+                    public_ip_address=network.SubResourceArgs(id=public_ip.id),
+                    subnet=network.SubResourceArgs(id=props.subnet_firewall_id),
+                )
+            ],
+            location=props.location,
+            management_ip_configuration=network.AzureFirewallIPConfigurationArgs(
+                name="FirewallManagementIpConfiguration",
+                public_ip_address=network.SubResourceArgs(id=public_ip_management.id),
+                subnet=network.SubResourceArgs(id=props.subnet_firewall_management_id),
+            ),
+            network_rule_collections=network_rule_collections,
+            resource_group_name=props.resource_group_name,
+            sku=network.AzureFirewallSkuArgs(
+                name=network.AzureFirewallSkuName.AZF_W_V_NET,
+                tier=network.AzureFirewallSkuTier.BASIC,
+            ),
+            opts=child_opts,
+            tags=child_tags,
+        )
+
+        # Retrieve the private IP address for the firewall
+        private_ip_address = self.firewall.ip_configurations.apply(
+            lambda cfgs: "" if not cfgs else cfgs[0].private_ip_address
+        )
+
+        # Route all external traffic through the firewall.
+        #
+        # We use the system default route "0.0.0.0/0" as this will be overruled by
+        # anything more specific, such as VNet <-> VNet traffic which we do not want to
+        # send via the firewall.
+        #
+        # See https://learn.microsoft.com/en-us/azure/virtual-network/virtual-networks-udr-overview
+        network.Route(
+            f"{self._name}_route_via_firewall",
+            address_prefix="0.0.0.0/0",
+            next_hop_ip_address=private_ip_address,
+            next_hop_type=network.RouteNextHopType.VIRTUAL_APPLIANCE,
+            resource_group_name=props.resource_group_name,
+            route_name="ViaFirewall",
+            route_table_name=props.route_table_name,
+            opts=ResourceOptions.merge(
+                child_opts, ResourceOptions(parent=self.firewall)
+            ),
+        )

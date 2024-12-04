@@ -88,6 +88,7 @@ def allow_internet_component_setter(
     return set_allow_workspace_internet
 
 
+# TODO: Move to production code.
 class InternetAccess(Enum):
     ENABLED = True
     DISABLED = False
@@ -102,9 +103,8 @@ class TestSREFirewallProps:
         firewall_props: SREFirewallProps = allow_internet_props_setter(
             allow_workspace_internet=True
         )
-        pulumi.Output.from_input(firewall_props.allow_workspace_internet).apply(
-            partial(assert_equal, True), run_with_unknowns=True  # noqa: FBT003
-        )
+
+        assert firewall_props.allow_workspace_internet
 
     @pulumi.runtime.test
     def test_props_allow_workspace_internet_disabled(
@@ -113,9 +113,8 @@ class TestSREFirewallProps:
         firewall_props: SREFirewallProps = allow_internet_props_setter(
             allow_workspace_internet=False
         )
-        pulumi.Output.from_input(firewall_props.allow_workspace_internet).apply(
-            partial(assert_equal, False), run_with_unknowns=True  # noqa: FBT003
-        )
+
+        assert not firewall_props.allow_workspace_internet
 
 
 class TestSREFirewallComponent:
@@ -129,8 +128,11 @@ class TestSREFirewallComponent:
             allow_workspace_internet=True
         )
 
-        firewall_component.firewall.application_rule_collections.apply(
-            partial(TestSREFirewallComponent.assert_allow_internet_access, InternetAccess.ENABLED),  # type: ignore
+        pulumi.Output.all(
+            firewall_component.firewall.application_rule_collections,
+            firewall_component.firewall.network_rule_collections,
+        ).apply(
+            partial(TestSREFirewallComponent.assert_allow_internet_access, internet_access=InternetAccess.ENABLED),  # type: ignore
             run_with_unknowns=True,
         )
 
@@ -143,33 +145,42 @@ class TestSREFirewallComponent:
             allow_workspace_internet=False
         )
 
-        firewall_component.firewall.application_rule_collections.apply(
-            partial(TestSREFirewallComponent.assert_allow_internet_access, InternetAccess.DISABLED),  # type: ignore
+        pulumi.Output.all(
+            firewall_component.firewall.application_rule_collections,
+            firewall_component.firewall.network_rule_collections,
+        ).apply(
+            partial(TestSREFirewallComponent.assert_allow_internet_access, internet_access=InternetAccess.DISABLED),  # type: ignore
             run_with_unknowns=True,
         )
 
     @staticmethod
     def assert_allow_internet_access(
+        args: list,
         internet_access: InternetAccess,
-        application_rule_collections: (
-            list[network.outputs.AzureFirewallApplicationRuleCollectionResponse] | None
-        ),
     ):
 
-        if application_rule_collections is not None:
+        application_rule_collections: list[dict] | None = args[0]
+        network_rule_collections: list[dict] | None = args[1]
 
-            workspace_deny_collection: list[
-                network.outputs.AzureFirewallApplicationRuleCollectionResponse
+        if (
+            application_rule_collections is not None
+            and network_rule_collections is not None
+        ):
+
+            allow_internet_collection: list[
+                network.outputs.AzureFirewallNetworkRuleCollectionResponse
             ] = [
                 rule_collection
-                for rule_collection in application_rule_collections
-                if rule_collection.name == "workspaces-deny"
+                for rule_collection in network_rule_collections
+                if rule_collection["name"] == "workspaces-all-allow"
             ]
 
             if internet_access == InternetAccess.ENABLED:
-                assert not workspace_deny_collection
+                assert len(application_rule_collections) == 0
+                assert len(allow_internet_collection) == 1
             else:
-                assert len(workspace_deny_collection) == 1
+                assert len(application_rule_collections) > 0
+                assert len(allow_internet_collection) == 0
 
         else:
             raise AssertionError()
