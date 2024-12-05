@@ -1,7 +1,26 @@
+import pulumi
+import pulumi.runtime
 from pulumi_azure_native import managedidentity, network, resources
 from pytest import fixture
 
 from data_safe_haven.infrastructure.common import SREIpRanges
+
+# Mock configuration.
+
+
+class DataSafeHavenMocks(pulumi.runtime.Mocks):
+    def new_resource(self, args: pulumi.runtime.MockResourceArgs):
+        resources = [args.name + "_id", args.inputs]
+        return resources
+
+    def call(self, _: pulumi.runtime.MockCallArgs):
+        return {}
+
+
+pulumi.runtime.set_mocks(
+    DataSafeHavenMocks(),
+    preview=False,
+)
 
 
 #

@@ -377,7 +377,7 @@ class SREFirewallComponent(ComponentResource):
         # send via the firewall.
         #
         # See https://learn.microsoft.com/en-us/azure/virtual-network/virtual-networks-udr-overview
-        network.Route(
+        self.route = network.Route(
             f"{self._name}_route_via_firewall",
             address_prefix="0.0.0.0/0",
             next_hop_ip_address=private_ip_address,
