@@ -1,4 +1,3 @@
-
 import pulumi
 import pulumi.runtime
 import pytest
