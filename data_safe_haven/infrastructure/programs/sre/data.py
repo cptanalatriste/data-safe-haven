@@ -49,7 +49,7 @@ class SREDataProps:
         admin_email_address: Input[str],
         admin_group_id: Input[str],
         admin_ip_addresses: Input[Sequence[str]],
-        data_provider_ip_addresses: Input[list[str]] | AzureServiceTag,
+        data_provider_ip_addresses: Input[list[str]],
         dns_private_zones: Input[dict[str, network.PrivateZone]],
         dns_record: Input[network.RecordSet],
         dns_server_admin_password: Input[pulumi_random.RandomPassword],
@@ -111,18 +111,13 @@ class SREDataComponent(ComponentResource):
         child_opts = ResourceOptions.merge(opts, ResourceOptions(parent=self))
         child_tags = {"component": "data"} | (tags if tags else {})
 
-        if isinstance(props.data_provider_ip_addresses, list):
-            data_private_sensitive_service_tag = None
-            data_private_sensitive_ip_addresses = Output.all(
-                props.data_configuration_ip_addresses, props.data_provider_ip_addresses
-            ).apply(
-                lambda address_lists: {
-                    ip for address_list in address_lists for ip in address_list
-                }
-            )
-        else:
-            data_private_sensitive_ip_addresses = None
-            data_private_sensitive_service_tag = props.data_provider_ip_addresses
+        data_private_sensitive_ip_addresses = Output.all(
+            props.data_configuration_ip_addresses, props.data_provider_ip_addresses
+        ).apply(
+            lambda address_lists: {
+                ip for address_list in address_lists for ip in address_list
+            }
+        )
 
         # Define Key Vault reader
         identity_key_vault_reader = managedidentity.UserAssignedIdentity(
