@@ -38,7 +38,7 @@ from data_safe_haven.infrastructure.components import (
     SSLCertificateProps,
     WrappedLogAnalyticsWorkspace,
 )
-from data_safe_haven.types import AzureDnsZoneNames, AzureServiceTag
+from data_safe_haven.types import AzureDnsZoneNames
 
 
 class SREDataProps:
@@ -514,7 +514,6 @@ class SREDataComponent(ComponentResource):
                     f"{''.join(truncate_tokens(stack_name.split('-'), 11))}sensitivedata{sha256hash(self._name)}"
                 )[:24],
                 allowed_ip_addresses=data_private_sensitive_ip_addresses,
-                allowed_service_tag=data_private_sensitive_service_tag,
                 location=props.location,
                 log_analytics_workspace=props.log_analytics_workspace,
                 subnet_id=props.subnet_data_private_id,
