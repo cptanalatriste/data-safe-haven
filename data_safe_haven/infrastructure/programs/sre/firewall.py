@@ -334,7 +334,9 @@ class SREFirewallComponent(ComponentResource):
                             destination_ports=["*"],
                             name="allow-internet-access",
                             protocols=[network.AzureFirewallNetworkRuleProtocol.ANY],
-                            source_addresses=props.subnet_workspaces_prefixes,
+                            source_addresses=[
+                                "*"
+                            ],  # TODO: Check if we can make this more restrictive.
                         )
                     ],
                 )
