@@ -22,17 +22,17 @@
 # - cryptography==44.0.0
 # - fqdn==1.5.1
 # - psycopg[binary]==3.1.19
-# - pulumi-azure-native==2.74.0
+# - pulumi-azure-native==2.76.0
 # - pulumi-azuread==6.0.1
 # - pulumi-random==4.16.7
 # - pulumi==3.142.0
-# - pydantic==2.10.2
+# - pydantic==2.10.3
 # - pyjwt[crypto]==2.10.1
 # - pytz==2024.2
 # - pyyaml==6.0.2
 # - rich==13.9.4
 # - simple-acme-dns==3.2.0
-# - typer==0.14.0
+# - typer==0.15.1
 # - websocket-client==1.8.0
 # - emoji==2.14.0
 # - myst-parser==4.0.0
@@ -241,7 +241,7 @@ pulumi==3.142.0
     #   pulumi-azure-native
     #   pulumi-azuread
     #   pulumi-random
-pulumi-azure-native==2.74.0
+pulumi-azure-native==2.76.0
     # via hatch.envs.docs
 pulumi-azuread==6.0.1
     # via hatch.envs.docs
@@ -249,7 +249,7 @@ pulumi-random==4.16.7
     # via hatch.envs.docs
 pycparser==2.22
     # via cffi
-pydantic==2.10.2
+pydantic==2.10.3
     # via hatch.envs.docs
 pydantic-core==2.27.1
     # via pydantic
@@ -307,7 +307,7 @@ shellingham==1.5.4
     #   typer-slim
 simple-acme-dns==3.2.0
     # via hatch.envs.docs
-six==1.16.0
+six==1.17.0
     # via
     #   azure-core
     #   pulumi
@@ -338,9 +338,9 @@ sphinxcontrib-serializinghtml==2.0.0
     # via sphinx
 sphinxcontrib-typer==0.5.1
     # via hatch.envs.docs
-typer==0.14.0
+typer==0.15.1
     # via hatch.envs.docs
-typer-slim==0.14.0
+typer-slim==0.15.1
     # via sphinxcontrib-typer
 typing-extensions==4.12.2
     # via
