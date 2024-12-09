@@ -51,7 +51,6 @@ class NFSV3StorageAccountComponent(ComponentResource):
         child_opts = ResourceOptions.merge(opts, ResourceOptions(parent=self))
         child_tags = {"component": "data"} | (tags if tags else {})
 
-        default_action = storage.DefaultAction.DENY
         ip_rules = Output.from_input(props.allowed_ip_addresses).apply(
             lambda ip_ranges: [
                 storage.IPRuleArgs(
@@ -77,7 +76,7 @@ class NFSV3StorageAccountComponent(ComponentResource):
             minimum_tls_version=storage.MinimumTlsVersion.TLS1_2,
             network_rule_set=storage.NetworkRuleSetArgs(
                 bypass=storage.Bypass.AZURE_SERVICES,
-                default_action=default_action,
+                default_action=storage.DefaultAction.DENY,
                 ip_rules=ip_rules,
                 virtual_network_rules=[
                     storage.VirtualNetworkRuleArgs(
