@@ -394,7 +394,7 @@ class SREFirewallComponent(ComponentResource):
                     },
                 }
             ],
-            resource_uri=firewall.id,
+            resource_uri=self.firewall.id,
             workspace_id=props.log_analytics_workspace.id,
         )
 
