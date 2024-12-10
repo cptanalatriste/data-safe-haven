@@ -11,12 +11,17 @@ dns:
 querylog:
   enabled: true
 filters:
+{{#allow_workspace_internet}}
+user_rules: []
+{{/allow_workspace_internet}}
+{{^allow_workspace_internet}}
 user_rules:
   # https://github.com/AdguardTeam/AdGuardHome/wiki/Hosts-Blocklists#adblock-style-syntax
   - "*.*"
   {{#filter_allow}}
   - "@@||{{.}}"
   {{/filter_allow}}
+{{/allow_workspace_internet}}
 log:
   verbose: true
 # Note that because we are only providing a partial config file we need the

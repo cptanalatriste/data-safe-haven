@@ -150,3 +150,11 @@ def subnet_workspaces() -> network.GetSubnetResult:
         address_prefix=SREIpRanges.workspaces.prefix,
         id="subnet_workspaces_id",
     )
+
+
+@fixture
+def subnet_monitoring() -> network.GetSubnetResult:
+    return network.GetSubnetResult(
+        address_prefix=SREIpRanges.monitoring.prefix,
+        id="subnet_monitoring_id",
+    )

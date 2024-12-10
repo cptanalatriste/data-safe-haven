@@ -28,12 +28,15 @@ class SREDnsServerProps:
 
     def __init__(
         self,
+        *,
+        allow_workspace_internet: bool,
         dockerhub_credentials: DockerHubCredentials,
         location: Input[str],
         resource_group_name: Input[str],
         shm_fqdn: Input[str],
     ) -> None:
         self.admin_username = "dshadmin"
+        self.allow_workspace_internet: bool = allow_workspace_internet
         self.dockerhub_credentials = dockerhub_credentials
         self.location = location
         self.resource_group_name = resource_group_name
@@ -69,6 +72,9 @@ class SREDnsServerComponent(ComponentResource):
         )
 
         # Expand AdGuardHome YAML configuration
+        mustache_values: dict[str, object] = {
+            "allow_workspace_internet": props.allow_workspace_internet
+        }
         adguard_adguardhome_yaml_contents = Output.all(
             admin_username=props.admin_username,
             # Only the first 72 bytes of the generated random string will be used but a
@@ -85,8 +91,8 @@ class SREDnsServerComponent(ComponentResource):
                 ]
             ),
         ).apply(
-            lambda mustache_values: adguard_adguardhome_yaml_reader.file_contents(
-                mustache_values
+            lambda mustache_config: adguard_adguardhome_yaml_reader.file_contents(
+                mustache_config | mustache_values
             )
         )
 
