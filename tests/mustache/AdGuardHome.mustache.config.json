@@ -1,0 +1,7 @@
+{
+    "filter_allow": [
+        "clamav.net",
+        "current.cvd.clamav.net"
+    ],
+    "allow_workspace_internet": true
+}
