@@ -110,11 +110,11 @@ jobs:
 
             if [ -e "$test_config" ]; then
               mustache $test_config $yamlfile > $yamlfile
-            else 
+            else
               sed "s|{{\([/#]\)[^}]*}}|{{\1array}}|g" $yamlfile > expanded.tmp  # replace mustache arrays
               sed -i "s|{{[^#/].\{1,\}}}|{{variable}}|g" expanded.tmp           # replace mustache variables
               mustache .mustache_config.json expanded.tmp > $yamlfile           # perform mustache expansion overwriting original file
-            fi 
+            fi
 
           done
           rm expanded.tmp
