@@ -36,7 +36,7 @@ class SREDnsServerProps:
         shm_fqdn: Input[str],
     ) -> None:
         self.admin_username = "dshadmin"
-        self.allow_workspace_internet: bool = allow_workspace_internet
+        self.allow_workspace_internet = allow_workspace_internet
         self.dockerhub_credentials = dockerhub_credentials
         self.location = location
         self.resource_group_name = resource_group_name
