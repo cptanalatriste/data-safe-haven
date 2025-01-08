@@ -72,14 +72,12 @@ class SREDnsServerComponent(ComponentResource):
         )
 
         # Expand AdGuardHome YAML configuration
-        mustache_values: dict[str, object] = {
-            "allow_workspace_internet": props.allow_workspace_internet
-        }
         adguard_adguardhome_yaml_contents = Output.all(
             admin_username=props.admin_username,
             # Only the first 72 bytes of the generated random string will be used but a
             # 20 character UTF-8 string (alphanumeric + special) will not exceed that.
             admin_password_encrypted=password_admin.bcrypt_hash,
+            allow_workspace_internet=props.allow_workspace_internet,
             # Use Azure virtual DNS server as upstream
             # https://learn.microsoft.com/en-us/azure/virtual-network/what-is-ip-address-168-63-129-16
             # This server is aware of private DNS zones
@@ -92,7 +90,7 @@ class SREDnsServerComponent(ComponentResource):
             ),
         ).apply(
             lambda mustache_config: adguard_adguardhome_yaml_reader.file_contents(
-                mustache_config | mustache_values
+                mustache_config
             )
         )
 
