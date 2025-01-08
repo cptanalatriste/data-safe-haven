@@ -114,9 +114,205 @@ class SREFirewallComponent(ComponentResource):
             tags=child_tags,
         )
 
-        if props.allow_workspace_internet:
-            application_rule_collections = []
+        application_rule_collections = [
+            network.AzureFirewallApplicationRuleCollectionArgs(
+                action=network.AzureFirewallRCActionArgs(
+                    type=network.AzureFirewallRCActionType.ALLOW
+                ),
+                name="apt-proxy-server",
+                priority=FirewallPriorities.SRE_APT_PROXY_SERVER,
+                rules=[
+                    network.AzureFirewallApplicationRuleArgs(
+                        description="Allow external apt repository requests",
+                        name="AllowAptRepositories",
+                        protocols=[
+                            network.AzureFirewallApplicationRuleProtocolArgs(
+                                port=int(Ports.HTTP),
+                                protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTP,
+                            ),
+                            network.AzureFirewallApplicationRuleProtocolArgs(
+                                port=int(Ports.HTTPS),
+                                protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTPS,
+                            ),
+                        ],
+                        source_addresses=props.subnet_apt_proxy_server_prefixes,
+                        target_fqdns=PermittedDomains.APT_REPOSITORIES,
+                    ),
+                ],
+            ),
+            network.AzureFirewallApplicationRuleCollectionArgs(
+                action=network.AzureFirewallRCActionArgs(
+                    type=network.AzureFirewallRCActionType.ALLOW
+                ),
+                name="clamav-mirror",
+                priority=FirewallPriorities.SRE_CLAMAV_MIRROR,
+                rules=[
+                    network.AzureFirewallApplicationRuleArgs(
+                        description="Allow external ClamAV definition update requests",
+                        name="AllowClamAVDefinitionUpdates",
+                        protocols=[
+                            network.AzureFirewallApplicationRuleProtocolArgs(
+                                port=int(Ports.HTTP),
+                                protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTP,
+                            ),
+                            network.AzureFirewallApplicationRuleProtocolArgs(
+                                port=int(Ports.HTTPS),
+                                protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTPS,
+                            ),
+                        ],
+                        source_addresses=props.subnet_clamav_mirror_prefixes,
+                        target_fqdns=PermittedDomains.CLAMAV_UPDATES,
+                    ),
+                ],
+            ),
+            network.AzureFirewallApplicationRuleCollectionArgs(
+                action=network.AzureFirewallRCActionArgs(
+                    type=network.AzureFirewallRCActionType.ALLOW
+                ),
+                name="identity-server",
+                priority=FirewallPriorities.SRE_IDENTITY_CONTAINERS,
+                rules=[
+                    network.AzureFirewallApplicationRuleArgs(
+                        description="Allow Microsoft OAuth login requests",
+                        name="AllowMicrosoftOAuthLogin",
+                        protocols=[
+                            network.AzureFirewallApplicationRuleProtocolArgs(
+                                port=int(Ports.HTTPS),
+                                protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTPS,
+                            )
+                        ],
+                        source_addresses=props.subnet_identity_containers_prefixes,
+                        target_fqdns=PermittedDomains.MICROSOFT_IDENTITY,
+                    ),
+                ],
+            ),
+            network.AzureFirewallApplicationRuleCollectionArgs(
+                action=network.AzureFirewallRCActionArgs(
+                    type=network.AzureFirewallRCActionType.ALLOW
+                ),
+                name="remote-desktop-gateway",
+                priority=FirewallPriorities.SRE_GUACAMOLE_CONTAINERS,
+                rules=[
+                    network.AzureFirewallApplicationRuleArgs(
+                        description="Allow Microsoft OAuth login requests",
+                        name="AllowMicrosoftOAuthLogin",
+                        protocols=[
+                            network.AzureFirewallApplicationRuleProtocolArgs(
+                                port=int(Ports.HTTPS),
+                                protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTPS,
+                            )
+                        ],
+                        source_addresses=props.subnet_guacamole_containers_prefixes,
+                        target_fqdns=PermittedDomains.MICROSOFT_LOGIN,
+                    ),
+                ],
+            ),
+            network.AzureFirewallApplicationRuleCollectionArgs(
+                action=network.AzureFirewallRCActionArgs(
+                    type=network.AzureFirewallRCActionType.ALLOW
+                ),
+                name="software-repositories",
+                priority=FirewallPriorities.SRE_USER_SERVICES_SOFTWARE_REPOSITORIES,
+                rules=[
+                    network.AzureFirewallApplicationRuleArgs(
+                        description="Allow external CRAN package requests",
+                        name="AllowCRANPackageDownload",
+                        protocols=[
+                            network.AzureFirewallApplicationRuleProtocolArgs(
+                                port=int(Ports.HTTPS),
+                                protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTPS,
+                            )
+                        ],
+                        source_addresses=props.subnet_user_services_software_repositories_prefixes,
+                        target_fqdns=PermittedDomains.SOFTWARE_REPOSITORIES_R,
+                    ),
+                    network.AzureFirewallApplicationRuleArgs(
+                        description="Allow external PyPI package requests",
+                        name="AllowPyPIPackageDownload",
+                        protocols=[
+                            network.AzureFirewallApplicationRuleProtocolArgs(
+                                port=int(Ports.HTTPS),
+                                protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTPS,
+                            )
+                        ],
+                        source_addresses=props.subnet_user_services_software_repositories_prefixes,
+                        target_fqdns=PermittedDomains.SOFTWARE_REPOSITORIES_PYTHON,
+                    ),
+                ],
+            ),
+            network.AzureFirewallApplicationRuleCollectionArgs(
+                action=network.AzureFirewallRCActionArgs(
+                    type=network.AzureFirewallRCActionType.ALLOW
+                ),
+                name="workspaces",
+                priority=FirewallPriorities.SRE_WORKSPACES,
+                rules=[
+                    network.AzureFirewallApplicationRuleArgs(
+                        description="Allow external Ubuntu keyserver requests",
+                        name="AllowUbuntuKeyserver",
+                        protocols=[
+                            network.AzureFirewallApplicationRuleProtocolArgs(
+                                port=int(Ports.HKP),
+                                protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTP,
+                            ),
+                        ],
+                        source_addresses=props.subnet_workspaces_prefixes,
+                        target_fqdns=PermittedDomains.UBUNTU_KEYSERVER,
+                    ),
+                    network.AzureFirewallApplicationRuleArgs(
+                        description="Allow external Ubuntu Snap Store access",
+                        name="AllowUbuntuSnapcraft",
+                        protocols=[
+                            network.AzureFirewallApplicationRuleProtocolArgs(
+                                port=int(Ports.HTTPS),
+                                protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTPS,
+                            ),
+                        ],
+                        source_addresses=props.subnet_workspaces_prefixes,
+                        target_fqdns=PermittedDomains.UBUNTU_SNAPCRAFT,
+                    ),
+                    network.AzureFirewallApplicationRuleArgs(
+                        description="Allow external RStudio deb downloads",
+                        name="AllowRStudioDeb",
+                        protocols=[
+                            network.AzureFirewallApplicationRuleProtocolArgs(
+                                port=int(Ports.HTTPS),
+                                protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTPS,
+                            ),
+                        ],
+                        source_addresses=props.subnet_workspaces_prefixes,
+                        target_fqdns=PermittedDomains.RSTUDIO_DEB,
+                    ),
+                ],
+            ),
+            network.AzureFirewallApplicationRuleCollectionArgs(
+                action=network.AzureFirewallRCActionArgs(
+                    type=network.AzureFirewallRCActionType.DENY
+                ),
+                name="workspaces-deny",
+                priority=FirewallPriorities.SRE_WORKSPACES_DENY,
+                rules=[
+                    network.AzureFirewallApplicationRuleArgs(
+                        description="Deny external Ubuntu Snap Store upload and login access",
+                        name="DenyUbuntuSnapcraft",
+                        protocols=[
+                            network.AzureFirewallApplicationRuleProtocolArgs(
+                                port=int(Ports.HTTP),
+                                protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTP,
+                            ),
+                            network.AzureFirewallApplicationRuleProtocolArgs(
+                                port=int(Ports.HTTPS),
+                                protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTPS,
+                            ),
+                        ],
+                        source_addresses=props.subnet_workspaces_prefixes,
+                        target_fqdns=ForbiddenDomains.UBUNTU_SNAPCRAFT,
+                    ),
+                ],
+            ),
+        ]
 
+        if props.allow_workspace_internet:
             network_rule_collections = [
                 network.AzureFirewallNetworkRuleCollectionArgs(
                     action=network.AzureFirewallRCActionArgs(
@@ -139,209 +335,7 @@ class SREFirewallComponent(ComponentResource):
                 ),
             ]
         else:
-            application_rule_collections: list[
-                network.AzureFirewallApplicationRuleCollectionArgs
-            ] = [
-                network.AzureFirewallApplicationRuleCollectionArgs(
-                    action=network.AzureFirewallRCActionArgs(
-                        type=network.AzureFirewallRCActionType.ALLOW
-                    ),
-                    name="apt-proxy-server",
-                    priority=FirewallPriorities.SRE_APT_PROXY_SERVER,
-                    rules=[
-                        network.AzureFirewallApplicationRuleArgs(
-                            description="Allow external apt repository requests",
-                            name="AllowAptRepositories",
-                            protocols=[
-                                network.AzureFirewallApplicationRuleProtocolArgs(
-                                    port=int(Ports.HTTP),
-                                    protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTP,
-                                ),
-                                network.AzureFirewallApplicationRuleProtocolArgs(
-                                    port=int(Ports.HTTPS),
-                                    protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTPS,
-                                ),
-                            ],
-                            source_addresses=props.subnet_apt_proxy_server_prefixes,
-                            target_fqdns=PermittedDomains.APT_REPOSITORIES,
-                        ),
-                    ],
-                ),
-                network.AzureFirewallApplicationRuleCollectionArgs(
-                    action=network.AzureFirewallRCActionArgs(
-                        type=network.AzureFirewallRCActionType.ALLOW
-                    ),
-                    name="clamav-mirror",
-                    priority=FirewallPriorities.SRE_CLAMAV_MIRROR,
-                    rules=[
-                        network.AzureFirewallApplicationRuleArgs(
-                            description="Allow external ClamAV definition update requests",
-                            name="AllowClamAVDefinitionUpdates",
-                            protocols=[
-                                network.AzureFirewallApplicationRuleProtocolArgs(
-                                    port=int(Ports.HTTP),
-                                    protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTP,
-                                ),
-                                network.AzureFirewallApplicationRuleProtocolArgs(
-                                    port=int(Ports.HTTPS),
-                                    protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTPS,
-                                ),
-                            ],
-                            source_addresses=props.subnet_clamav_mirror_prefixes,
-                            target_fqdns=PermittedDomains.CLAMAV_UPDATES,
-                        ),
-                    ],
-                ),
-                network.AzureFirewallApplicationRuleCollectionArgs(
-                    action=network.AzureFirewallRCActionArgs(
-                        type=network.AzureFirewallRCActionType.ALLOW
-                    ),
-                    name="identity-server",
-                    priority=FirewallPriorities.SRE_IDENTITY_CONTAINERS,
-                    rules=[
-                        network.AzureFirewallApplicationRuleArgs(
-                            description="Allow Microsoft OAuth login requests",
-                            name="AllowMicrosoftOAuthLogin",
-                            protocols=[
-                                network.AzureFirewallApplicationRuleProtocolArgs(
-                                    port=int(Ports.HTTPS),
-                                    protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTPS,
-                                )
-                            ],
-                            source_addresses=props.subnet_identity_containers_prefixes,
-                            target_fqdns=PermittedDomains.MICROSOFT_IDENTITY,
-                        ),
-                    ],
-                ),
-                network.AzureFirewallApplicationRuleCollectionArgs(
-                    action=network.AzureFirewallRCActionArgs(
-                        type=network.AzureFirewallRCActionType.ALLOW
-                    ),
-                    name="remote-desktop-gateway",
-                    priority=FirewallPriorities.SRE_GUACAMOLE_CONTAINERS,
-                    rules=[
-                        network.AzureFirewallApplicationRuleArgs(
-                            description="Allow Microsoft OAuth login requests",
-                            name="AllowMicrosoftOAuthLogin",
-                            protocols=[
-                                network.AzureFirewallApplicationRuleProtocolArgs(
-                                    port=int(Ports.HTTPS),
-                                    protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTPS,
-                                )
-                            ],
-                            source_addresses=props.subnet_guacamole_containers_prefixes,
-                            target_fqdns=PermittedDomains.MICROSOFT_LOGIN,
-                        ),
-                    ],
-                ),
-                network.AzureFirewallApplicationRuleCollectionArgs(
-                    action=network.AzureFirewallRCActionArgs(
-                        type=network.AzureFirewallRCActionType.ALLOW
-                    ),
-                    name="software-repositories",
-                    priority=FirewallPriorities.SRE_USER_SERVICES_SOFTWARE_REPOSITORIES,
-                    rules=[
-                        network.AzureFirewallApplicationRuleArgs(
-                            description="Allow external CRAN package requests",
-                            name="AllowCRANPackageDownload",
-                            protocols=[
-                                network.AzureFirewallApplicationRuleProtocolArgs(
-                                    port=int(Ports.HTTPS),
-                                    protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTPS,
-                                )
-                            ],
-                            source_addresses=props.subnet_user_services_software_repositories_prefixes,
-                            target_fqdns=PermittedDomains.SOFTWARE_REPOSITORIES_R,
-                        ),
-                        network.AzureFirewallApplicationRuleArgs(
-                            description="Allow external PyPI package requests",
-                            name="AllowPyPIPackageDownload",
-                            protocols=[
-                                network.AzureFirewallApplicationRuleProtocolArgs(
-                                    port=int(Ports.HTTPS),
-                                    protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTPS,
-                                )
-                            ],
-                            source_addresses=props.subnet_user_services_software_repositories_prefixes,
-                            target_fqdns=PermittedDomains.SOFTWARE_REPOSITORIES_PYTHON,
-                        ),
-                    ],
-                ),
-                network.AzureFirewallApplicationRuleCollectionArgs(
-                    action=network.AzureFirewallRCActionArgs(
-                        type=network.AzureFirewallRCActionType.ALLOW
-                    ),
-                    name="workspaces",
-                    priority=FirewallPriorities.SRE_WORKSPACES,
-                    rules=[
-                        network.AzureFirewallApplicationRuleArgs(
-                            description="Allow external Ubuntu keyserver requests",
-                            name="AllowUbuntuKeyserver",
-                            protocols=[
-                                network.AzureFirewallApplicationRuleProtocolArgs(
-                                    port=int(Ports.HKP),
-                                    protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTP,
-                                ),
-                            ],
-                            source_addresses=props.subnet_workspaces_prefixes,
-                            target_fqdns=PermittedDomains.UBUNTU_KEYSERVER,
-                        ),
-                        network.AzureFirewallApplicationRuleArgs(
-                            description="Allow external Ubuntu Snap Store access",
-                            name="AllowUbuntuSnapcraft",
-                            protocols=[
-                                network.AzureFirewallApplicationRuleProtocolArgs(
-                                    port=int(Ports.HTTPS),
-                                    protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTPS,
-                                ),
-                            ],
-                            source_addresses=props.subnet_workspaces_prefixes,
-                            target_fqdns=PermittedDomains.UBUNTU_SNAPCRAFT,
-                        ),
-                        network.AzureFirewallApplicationRuleArgs(
-                            description="Allow external RStudio deb downloads",
-                            name="AllowRStudioDeb",
-                            protocols=[
-                                network.AzureFirewallApplicationRuleProtocolArgs(
-                                    port=int(Ports.HTTPS),
-                                    protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTPS,
-                                ),
-                            ],
-                            source_addresses=props.subnet_workspaces_prefixes,
-                            target_fqdns=PermittedDomains.RSTUDIO_DEB,
-                        ),
-                    ],
-                ),
-                network.AzureFirewallApplicationRuleCollectionArgs(
-                    action=network.AzureFirewallRCActionArgs(
-                        type=network.AzureFirewallRCActionType.DENY
-                    ),
-                    name="workspaces-deny",
-                    priority=FirewallPriorities.SRE_WORKSPACES_DENY,
-                    rules=[
-                        network.AzureFirewallApplicationRuleArgs(
-                            description="Deny external Ubuntu Snap Store upload and login access",
-                            name="DenyUbuntuSnapcraft",
-                            protocols=[
-                                network.AzureFirewallApplicationRuleProtocolArgs(
-                                    port=int(Ports.HTTP),
-                                    protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTP,
-                                ),
-                                network.AzureFirewallApplicationRuleProtocolArgs(
-                                    port=int(Ports.HTTPS),
-                                    protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTPS,
-                                ),
-                            ],
-                            source_addresses=props.subnet_workspaces_prefixes,
-                            target_fqdns=ForbiddenDomains.UBUNTU_SNAPCRAFT,
-                        ),
-                    ],
-                ),
-            ]
-
-            network_rule_collections: list[
-                network.AzureFirewallNetworkRuleCollectionArgs
-            ] = []
+            network_rule_collections = []
 
         # Deploy firewall
         self.firewall = network.AzureFirewall(
