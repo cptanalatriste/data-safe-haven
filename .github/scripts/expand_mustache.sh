@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 echo '{"array": ["dummy"], "variable": "dummy"}' > .mustache_config.json
 
-while read -r -d '' yamlfile; do
+while read -r yamlfile; do
 
     filename=$(basename -- "$yamlfile")
     filename="${filename%.*}"
