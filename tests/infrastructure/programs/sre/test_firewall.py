@@ -1,7 +1,7 @@
 import pulumi
 import pulumi.runtime
-import pytest
 from pulumi_azure_native import network
+from pytest import fixture
 
 from data_safe_haven.functions import replace_separators
 from data_safe_haven.infrastructure.programs.sre.firewall import (
@@ -15,7 +15,7 @@ from data_safe_haven.infrastructure.programs.sre.monitoring import (
 from data_safe_haven.types import AzureDnsZoneNames
 
 
-@pytest.fixture
+@fixture
 def sre_monitoring_component(
     location: str,
     resource_group_name: str,
@@ -48,7 +48,7 @@ def sre_monitoring_component(
     )
 
 
-@pytest.fixture
+@fixture
 def firewall_props_internet_enabled(
     location: str,
     resource_group_name: str,
@@ -80,7 +80,7 @@ def firewall_props_internet_enabled(
     )
 
 
-@pytest.fixture
+@fixture
 def firewall_props_internet_disabled(
     location: str,
     resource_group_name: str,
