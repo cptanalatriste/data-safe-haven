@@ -114,7 +114,7 @@ class SREFirewallComponent(ComponentResource):
             tags=child_tags,
         )
 
-        application_rule_collections = [
+        application_rule_collections_common = [
             network.AzureFirewallApplicationRuleCollectionArgs(
                 action=network.AzureFirewallRCActionArgs(
                     type=network.AzureFirewallRCActionType.ALLOW
@@ -240,79 +240,10 @@ class SREFirewallComponent(ComponentResource):
                     ),
                 ],
             ),
-            network.AzureFirewallApplicationRuleCollectionArgs(
-                action=network.AzureFirewallRCActionArgs(
-                    type=network.AzureFirewallRCActionType.ALLOW
-                ),
-                name="workspaces-allow",
-                priority=FirewallPriorities.SRE_WORKSPACES,
-                rules=[
-                    network.AzureFirewallApplicationRuleArgs(
-                        description="Allow external Ubuntu keyserver requests",
-                        name="AllowUbuntuKeyserver",
-                        protocols=[
-                            network.AzureFirewallApplicationRuleProtocolArgs(
-                                port=int(Ports.HKP),
-                                protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTP,
-                            ),
-                        ],
-                        source_addresses=props.subnet_workspaces_prefixes,
-                        target_fqdns=PermittedDomains.UBUNTU_KEYSERVER,
-                    ),
-                    network.AzureFirewallApplicationRuleArgs(
-                        description="Allow external Ubuntu Snap Store access",
-                        name="AllowUbuntuSnapcraft",
-                        protocols=[
-                            network.AzureFirewallApplicationRuleProtocolArgs(
-                                port=int(Ports.HTTPS),
-                                protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTPS,
-                            ),
-                        ],
-                        source_addresses=props.subnet_workspaces_prefixes,
-                        target_fqdns=PermittedDomains.UBUNTU_SNAPCRAFT,
-                    ),
-                    network.AzureFirewallApplicationRuleArgs(
-                        description="Allow external RStudio deb downloads",
-                        name="AllowRStudioDeb",
-                        protocols=[
-                            network.AzureFirewallApplicationRuleProtocolArgs(
-                                port=int(Ports.HTTPS),
-                                protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTPS,
-                            ),
-                        ],
-                        source_addresses=props.subnet_workspaces_prefixes,
-                        target_fqdns=PermittedDomains.RSTUDIO_DEB,
-                    ),
-                ],
-            ),
-            network.AzureFirewallApplicationRuleCollectionArgs(
-                action=network.AzureFirewallRCActionArgs(
-                    type=network.AzureFirewallRCActionType.DENY
-                ),
-                name="workspaces-deny",
-                priority=FirewallPriorities.SRE_WORKSPACES_DENY,
-                rules=[
-                    network.AzureFirewallApplicationRuleArgs(
-                        description="Deny external Ubuntu Snap Store upload and login access",
-                        name="DenyUbuntuSnapcraft",
-                        protocols=[
-                            network.AzureFirewallApplicationRuleProtocolArgs(
-                                port=int(Ports.HTTP),
-                                protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTP,
-                            ),
-                            network.AzureFirewallApplicationRuleProtocolArgs(
-                                port=int(Ports.HTTPS),
-                                protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTPS,
-                            ),
-                        ],
-                        source_addresses=props.subnet_workspaces_prefixes,
-                        target_fqdns=ForbiddenDomains.UBUNTU_SNAPCRAFT,
-                    ),
-                ],
-            ),
         ]
 
         if props.allow_workspace_internet:
+            application_rule_collections = application_rule_collections_common
             network_rule_collections = [
                 network.AzureFirewallNetworkRuleCollectionArgs(
                     action=network.AzureFirewallRCActionArgs(
@@ -333,6 +264,79 @@ class SREFirewallComponent(ComponentResource):
                 ),
             ]
         else:
+            application_rule_collections = [
+                *application_rule_collections_common,
+                network.AzureFirewallApplicationRuleCollectionArgs(
+                    action=network.AzureFirewallRCActionArgs(
+                        type=network.AzureFirewallRCActionType.ALLOW
+                    ),
+                    name="workspaces-allow-restricted",
+                    priority=FirewallPriorities.SRE_WORKSPACES,
+                    rules=[
+                        network.AzureFirewallApplicationRuleArgs(
+                            description="Allow external Ubuntu keyserver requests",
+                            name="AllowUbuntuKeyserver",
+                            protocols=[
+                                network.AzureFirewallApplicationRuleProtocolArgs(
+                                    port=int(Ports.HKP),
+                                    protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTP,
+                                ),
+                            ],
+                            source_addresses=props.subnet_workspaces_prefixes,
+                            target_fqdns=PermittedDomains.UBUNTU_KEYSERVER,
+                        ),
+                        network.AzureFirewallApplicationRuleArgs(
+                            description="Allow external Ubuntu Snap Store access",
+                            name="AllowUbuntuSnapcraft",
+                            protocols=[
+                                network.AzureFirewallApplicationRuleProtocolArgs(
+                                    port=int(Ports.HTTPS),
+                                    protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTPS,
+                                ),
+                            ],
+                            source_addresses=props.subnet_workspaces_prefixes,
+                            target_fqdns=PermittedDomains.UBUNTU_SNAPCRAFT,
+                        ),
+                        network.AzureFirewallApplicationRuleArgs(
+                            description="Allow external RStudio deb downloads",
+                            name="AllowRStudioDeb",
+                            protocols=[
+                                network.AzureFirewallApplicationRuleProtocolArgs(
+                                    port=int(Ports.HTTPS),
+                                    protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTPS,
+                                ),
+                            ],
+                            source_addresses=props.subnet_workspaces_prefixes,
+                            target_fqdns=PermittedDomains.RSTUDIO_DEB,
+                        ),
+                    ],
+                ),
+                network.AzureFirewallApplicationRuleCollectionArgs(
+                    action=network.AzureFirewallRCActionArgs(
+                        type=network.AzureFirewallRCActionType.DENY
+                    ),
+                    name="workspaces-deny",
+                    priority=FirewallPriorities.SRE_WORKSPACES_DENY,
+                    rules=[
+                        network.AzureFirewallApplicationRuleArgs(
+                            description="Deny external Ubuntu Snap Store upload and login access",
+                            name="DenyUbuntuSnapcraft",
+                            protocols=[
+                                network.AzureFirewallApplicationRuleProtocolArgs(
+                                    port=int(Ports.HTTP),
+                                    protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTP,
+                                ),
+                                network.AzureFirewallApplicationRuleProtocolArgs(
+                                    port=int(Ports.HTTPS),
+                                    protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTPS,
+                                ),
+                            ],
+                            source_addresses=props.subnet_workspaces_prefixes,
+                            target_fqdns=ForbiddenDomains.UBUNTU_SNAPCRAFT,
+                        ),
+                    ],
+                ),
+            ]
             network_rule_collections = []
 
         # Deploy firewall
