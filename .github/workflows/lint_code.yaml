@@ -106,7 +106,7 @@ jobs:
             filename=$(basename -- "$yamlfile")
             extension="${filename##*.}"
             filename="${filename%.*}"
-            test_config="tests/mustache/$filename.config.json"
+            test_config=".github/resources/$filename.config.json"
 
             if [ -e "$test_config" ]; then
               mustache $test_config $yamlfile > $yamlfile
