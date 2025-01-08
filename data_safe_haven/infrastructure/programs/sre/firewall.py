@@ -325,7 +325,7 @@ class SREFirewallComponent(ComponentResource):
                     action=network.AzureFirewallRCActionArgs(
                         type=network.AzureFirewallRCActionType.ALLOW
                     ),
-                    name="workspaces-all-allow",  # TODO: Fix other names.
+                    name="workspaces-all-allow",
                     priority=FirewallPriorities.SRE_WORKSPACES,
                     rules=[
                         network.AzureFirewallNetworkRuleArgs(
