@@ -8,7 +8,8 @@ while read -r yamlfile; do
     test_config=".github/resources/$filename.config.json"
 
     if [ -e "$test_config" ]; then
-        mustache "$test_config" "$yamlfile" | sponge "$yamlfile"
+        cp "$yamlfile" expanded.tmp
+        mustache "$test_config" expanded.tmp > "$yamlfile"
     else
         # replace mustache arrays
         sed "s|{{\([/#]\)[^}]*}}|{{\1array}}|g" "$yamlfile" > expanded.tmp
