@@ -119,7 +119,7 @@ class SREFirewallComponent(ComponentResource):
                 action=network.AzureFirewallRCActionArgs(
                     type=network.AzureFirewallRCActionType.ALLOW
                 ),
-                name="apt-proxy-server",
+                name="apt-proxy-server-allow",
                 priority=FirewallPriorities.SRE_APT_PROXY_SERVER,
                 rules=[
                     network.AzureFirewallApplicationRuleArgs(
@@ -144,7 +144,7 @@ class SREFirewallComponent(ComponentResource):
                 action=network.AzureFirewallRCActionArgs(
                     type=network.AzureFirewallRCActionType.ALLOW
                 ),
-                name="clamav-mirror",
+                name="clamav-mirror-allow",
                 priority=FirewallPriorities.SRE_CLAMAV_MIRROR,
                 rules=[
                     network.AzureFirewallApplicationRuleArgs(
@@ -169,7 +169,7 @@ class SREFirewallComponent(ComponentResource):
                 action=network.AzureFirewallRCActionArgs(
                     type=network.AzureFirewallRCActionType.ALLOW
                 ),
-                name="identity-server",
+                name="identity-server-allow",
                 priority=FirewallPriorities.SRE_IDENTITY_CONTAINERS,
                 rules=[
                     network.AzureFirewallApplicationRuleArgs(
@@ -190,7 +190,7 @@ class SREFirewallComponent(ComponentResource):
                 action=network.AzureFirewallRCActionArgs(
                     type=network.AzureFirewallRCActionType.ALLOW
                 ),
-                name="remote-desktop-gateway",
+                name="remote-desktop-gateway-allow",
                 priority=FirewallPriorities.SRE_GUACAMOLE_CONTAINERS,
                 rules=[
                     network.AzureFirewallApplicationRuleArgs(
@@ -211,7 +211,7 @@ class SREFirewallComponent(ComponentResource):
                 action=network.AzureFirewallRCActionArgs(
                     type=network.AzureFirewallRCActionType.ALLOW
                 ),
-                name="software-repositories",
+                name="software-repositories-allow",
                 priority=FirewallPriorities.SRE_USER_SERVICES_SOFTWARE_REPOSITORIES,
                 rules=[
                     network.AzureFirewallApplicationRuleArgs(
@@ -244,7 +244,7 @@ class SREFirewallComponent(ComponentResource):
                 action=network.AzureFirewallRCActionArgs(
                     type=network.AzureFirewallRCActionType.ALLOW
                 ),
-                name="workspaces",
+                name="workspaces-allow",
                 priority=FirewallPriorities.SRE_WORKSPACES,
                 rules=[
                     network.AzureFirewallApplicationRuleArgs(
@@ -318,7 +318,7 @@ class SREFirewallComponent(ComponentResource):
                     action=network.AzureFirewallRCActionArgs(
                         type=network.AzureFirewallRCActionType.ALLOW
                     ),
-                    name="workspaces-all-allow",
+                    name="workspaces-allow-all",
                     priority=FirewallPriorities.SRE_WORKSPACES,
                     rules=[
                         network.AzureFirewallNetworkRuleArgs(
