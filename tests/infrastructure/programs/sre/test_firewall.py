@@ -132,17 +132,17 @@ class TestSREFirewallComponent:
         def assert_on_firewall_rules(
             args: list,
         ):
-            application_rule_collections: list[dict] = args[0]
-            network_rule_collections: list[dict] = args[1]
+            application_rule_collections = args[0]
+            network_rule_collections = args[1]
 
             # TODO: Be more precise in rule filtering.
             allow_internet_collection: list[dict] = [
                 rule_collection
                 for rule_collection in network_rule_collections
-                if rule_collection["name"] == "workspaces-all-allow"
+                if rule_collection["name"] == "workspaces-allow-all"
             ]
 
-            assert len(application_rule_collections) == 0
+            assert len(application_rule_collections) == 5
             assert len(allow_internet_collection) == 1
 
         pulumi.Output.all(
@@ -167,11 +167,11 @@ class TestSREFirewallComponent:
         def assert_on_firewall_rules(
             args: list,
         ):
-            application_rule_collections: list[dict] = args[0]
-            network_rule_collections: list[dict] = args[1]
+            application_rule_collections = args[0]
+            network_rule_collections = args[1]
 
             assert len(application_rule_collections) > 0
-            assert len(network_rule_collections) == 0
+            assert network_rule_collections is None
 
         pulumi.Output.all(
             firewall_component.firewall.application_rule_collections,
