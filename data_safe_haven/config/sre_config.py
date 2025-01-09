@@ -76,10 +76,10 @@ class SREConfig(AzureSerialisableModel):
             software_packages = SoftwarePackageCategory.NONE
         else:
             allow_workspace_internet = (
-                "True/False: whether to allow outbound internet access from workspaces. "
+                "True/False: whether to allow outbound internet access from workspaces.  "  # type: ignore
                 "WARNING setting this to True will allow data to be moved out of the SRE "
                 "WITHOUT OVERSIGHT OR APPROVAL"
-            )  # type: ignore
+            )
             remote_desktop_allow_copy = "True/False: whether to allow copying text out of the environment."  # type: ignore
             remote_desktop_allow_paste = "True/False: whether to allow pasting text into the environment."  # type: ignore
             software_packages = "[any/pre-approved/none]: which Python/R packages to allow users to install."  # type: ignore

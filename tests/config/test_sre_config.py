@@ -97,7 +97,7 @@ class TestConfig:
             (2, False, False, False, SoftwarePackageCategory.ANY),
             (3, False, False, False, SoftwarePackageCategory.PRE_APPROVED),
             (4, False, False, False, SoftwarePackageCategory.NONE),
-        ]
+        ],
     )
     def test_template_tiers(self, tier, allow_internet, copy, paste, packages):
         config = SREConfig.template(tier=tier)
