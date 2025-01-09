@@ -258,7 +258,7 @@ class SREFirewallComponent(ComponentResource):
                             destination_ports=["*"],
                             name="allow-internet-access",
                             protocols=[network.AzureFirewallNetworkRuleProtocol.ANY],
-                            source_addresses=[props.subnet_workspaces_prefixes],
+                            source_addresses=props.subnet_workspaces_prefixes,
                         )
                     ],
                 ),
@@ -337,7 +337,7 @@ class SREFirewallComponent(ComponentResource):
                     ],
                 ),
             ]
-            network_rule_collections = []
+            network_rule_collections = None
 
         # Deploy firewall
         self.firewall = network.AzureFirewall(
