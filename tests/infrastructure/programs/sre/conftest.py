@@ -5,10 +5,8 @@ from pytest import fixture
 
 from data_safe_haven.infrastructure.common import SREIpRanges
 
-# Mock configuration.
-
-
 class DataSafeHavenMocks(pulumi.runtime.Mocks):
+    """Configuration for Pulumi mocks"""
     def new_resource(self, args: pulumi.runtime.MockResourceArgs):
         resources = [args.name + "_id", args.inputs]
         return resources
