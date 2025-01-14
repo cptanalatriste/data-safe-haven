@@ -244,6 +244,8 @@ class SREFirewallComponent(ComponentResource):
 
         if props.allow_workspace_internet:
             application_rule_collections = application_rule_collections_common
+            # A network rule is used as application rules are restricted to certain
+            # types of traffic, e.g. HTTP, HTTPS
             network_rule_collections = [
                 network.AzureFirewallNetworkRuleCollectionArgs(
                     action=network.AzureFirewallRCActionArgs(
