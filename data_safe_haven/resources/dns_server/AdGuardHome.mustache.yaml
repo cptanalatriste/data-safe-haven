@@ -12,7 +12,6 @@ querylog:
   enabled: true
 filters:
 # https://adblockplus.org/filter-cheatsheet#blocking
-{{#user_rules}}
 user_rules:
   {{#filter_block}}
   - "{{.}}"
@@ -20,10 +19,6 @@ user_rules:
   {{#filter_allow}}
   - "@@||{{.}}"
   {{/filter_allow}}
-{{/user_rules}}
-{{^user_rules}}
-user_rules: []
-{{/user_rules}}
 log:
   verbose: true
 # Note that because we are only providing a partial config file we need the

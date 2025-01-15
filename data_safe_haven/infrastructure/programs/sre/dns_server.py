@@ -82,8 +82,7 @@ class SREDnsServerComponent(ComponentResource):
             filter_block = ["*.*"]
         else:
             filter_allow = None
-            filter_block = None
-        user_rules = filter_allow or filter_block
+            filter_block = ["example.local"]
 
         # Expand AdGuardHome YAML configuration
         adguard_adguardhome_yaml_contents = Output.all(
@@ -97,7 +96,6 @@ class SREDnsServerComponent(ComponentResource):
             # https://learn.microsoft.com/en-us/azure/virtual-network/what-is-ip-address-168-63-129-16
             # This server is aware of private DNS zones
             upstream_dns="168.63.129.16",
-            user_rules=user_rules,
         ).apply(
             lambda mustache_config: adguard_adguardhome_yaml_reader.file_contents(
                 mustache_config
