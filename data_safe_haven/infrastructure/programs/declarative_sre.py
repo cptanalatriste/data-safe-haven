@@ -156,11 +156,14 @@ class DeclarativeSRE:
         # Deploy Entra resources
         entra = SREEntraComponent(
             "sre_entra",
+            self.stack_name,
             SREEntraProps(
                 group_names=ldap_group_names,
+                resource_group=resource_group,
                 shm_name=self.context.name,
                 sre_fqdn=networking.sre_fqdn,
                 sre_name=self.config.name,
+                subscription_id=self.config.azure.subscription_id,
             ),
         )
 

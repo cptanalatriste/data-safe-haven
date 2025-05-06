@@ -1,11 +1,14 @@
 """Pulumi component for SRE Entra resources"""
 
 from collections.abc import Mapping
+from typing import ClassVar
 
 import pulumi_azuread as entra
 from pulumi import ComponentResource, Input, Output, ResourceOptions
+from pulumi_azure_native import authorization, resources
 
-from data_safe_haven.functions import replace_separators
+from data_safe_haven.functions import replace_separators, seeded_uuid
+from data_safe_haven.infrastructure.common import get_id_from_rg
 from data_safe_haven.infrastructure.components import (
     EntraApplicationComponent,
     EntraDesktopApplicationProps,
@@ -20,22 +23,31 @@ class SREEntraProps:
     def __init__(
         self,
         group_names: Mapping[str, str],
+        resource_group: Input[resources.ResourceGroup],
         sre_fqdn: Input[str],
         shm_name: Input[str],
         sre_name: Input[str],
+        subscription_id: Input[str],
     ) -> None:
         self.group_names = group_names
+        self.resource_group_id = Output.from_input(resource_group).apply(get_id_from_rg)
         self.shm_name = shm_name
         self.sre_fqdn = sre_fqdn
         self.sre_name = sre_name
+        self.subscription_id = subscription_id
 
 
 class SREEntraComponent(ComponentResource):
     """Deploy SRE Entra resources with Pulumi"""
 
+    azure_role_ids: ClassVar[dict[str, str]] = {
+        "DNS Zone Contributor": "befefa01-2a29-4197-83a8-272ff33ce314"
+    }
+
     def __init__(
         self,
         name: str,
+        stack_name: str,
         props: SREEntraProps,
         opts: ResourceOptions | None = None,
     ) -> None:
@@ -115,9 +127,53 @@ class SREEntraComponent(ComponentResource):
             opts=child_opts,
         )
 
+        # DNS monitor application
+        self.dns_monitor_application = EntraApplicationComponent(
+            f"{self._name}_dns_monitor",
+            EntraDesktopApplicationProps(
+                application_name=Output.concat(
+                    "Data Safe Haven (",
+                    props.shm_name,
+                    " - ",
+                    props.sre_name,
+                    ") DNS Monitor Service Principal",
+                ),
+                application_permissions=[],
+                msgraph_service_principal=msgraph_service_principal,
+            ),
+        )
+
+        # Add an application password to the DNS monitor.
+        self.dns_monitor_application_secret = entra.ApplicationPassword(
+            f"{self._name}_dns_monitor_application_secret",
+            application_id=self.dns_monitor_application.application.id,
+            display_name="DNS Monitor Authentication Secret",
+        )
+
+        # Grant "DNS Zone Contributor" permissions to the Service Principal.
+        authorization.RoleAssignment(
+            f"{self._name}_dns_zone_contributor_role_assignment",
+            principal_id=self.dns_monitor_application.application_service_principal.object_id,
+            principal_type=authorization.PrincipalType.SERVICE_PRINCIPAL,
+            role_assignment_name=str(seeded_uuid(f"{stack_name} DNS Zone Contributor")),
+            role_definition_id=Output.concat(
+                "/subscriptions/",
+                props.subscription_id,
+                "/providers/Microsoft.Authorization/roleDefinitions/",
+                self.azure_role_ids["DNS Zone Contributor"],
+            ),
+            scope=props.resource_group_id,
+            opts=child_opts,
+        )
+
         # Register outputs
         self.identity_application_id = self.identity_application.application.client_id
         self.identity_application_secret = self.identity_application_secret.value
         self.remote_desktop_application_id = (
             self.remote_desktop_application.application.client_id
         )
+
+        self.dns_monitor_application_id = (
+            self.dns_monitor_application.application.client_id
+        )
+        self.dns_monitor_application_secret = self.dns_monitor_application_secret.value
