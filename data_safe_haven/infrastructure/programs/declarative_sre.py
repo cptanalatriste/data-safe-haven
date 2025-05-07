@@ -340,8 +340,11 @@ class DeclarativeSRE:
             SREUserServicesProps(
                 database_service_admin_password=data.password_database_service_admin,
                 databases=self.config.sre.databases,
+                dns_monitor_application_id=entra.dns_monitor_application_id,
+                dns_monitor_application_secret=entra.dns_monitor_application_secret,
                 dns_server_ip=dns.ip_address,
                 dockerhub_credentials=dockerhub_credentials,
+                entra_tenant_id=shm_entra_tenant_id,
                 gitea_database_password=data.password_gitea_database_admin,
                 hedgedoc_database_password=data.password_hedgedoc_database_admin,
                 ldap_server_hostname=identity.hostname,

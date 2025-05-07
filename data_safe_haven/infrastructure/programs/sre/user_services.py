@@ -26,8 +26,11 @@ class SREUserServicesProps:
         self,
         database_service_admin_password: Input[str],
         databases: list[DatabaseSystem],  # this must *not* be passed as an Input[T]
+        dns_monitor_application_id: Input[str],
+        dns_monitor_application_secret: Input[str],
         dns_server_ip: Input[str],
         dockerhub_credentials: DockerHubCredentials,
+        entra_tenant_id: Input[str],
         gitea_database_password: Input[str],
         hedgedoc_database_password: Input[str],
         ldap_server_hostname: Input[str],
@@ -51,8 +54,11 @@ class SREUserServicesProps:
     ) -> None:
         self.database_service_admin_password = database_service_admin_password
         self.databases = databases
+        self.dns_monitor_application_id = dns_monitor_application_id
+        self.dns_monitor_application_secret = dns_monitor_application_secret
         self.dns_server_ip = dns_server_ip
         self.dockerhub_credentials = dockerhub_credentials
+        self.entra_tenant_id = entra_tenant_id
         self.gitea_database_password = gitea_database_password
         self.hedgedoc_database_password = hedgedoc_database_password
         self.ldap_server_hostname = ldap_server_hostname
@@ -106,7 +112,10 @@ class SREUserServicesComponent(ComponentResource):
                 containers_subnet_id=props.subnet_containers_id,
                 database_subnet_id=props.subnet_containers_support_id,
                 database_password=props.gitea_database_password,
+                dns_monitor_application_id=props.dns_monitor_application_id,
+                dns_monitor_application_secret=props.dns_monitor_application_secret,
                 dns_server_ip=props.dns_server_ip,
+                entra_tenant_id=props.entra_tenant_id,
                 dockerhub_credentials=props.dockerhub_credentials,
                 ldap_server_hostname=props.ldap_server_hostname,
                 ldap_server_port=props.ldap_server_port,

@@ -28,8 +28,11 @@ class SREGiteaServerProps:
         containers_subnet_id: Input[str],
         database_password: Input[str],
         database_subnet_id: Input[str],
+        dns_monitor_application_id: Input[str],
+        dns_monitor_application_secret: Input[str],
         dns_server_ip: Input[str],
         dockerhub_credentials: DockerHubCredentials,
+        entra_tenant_id: Input[str],
         ldap_server_hostname: Input[str],
         ldap_server_port: Input[int],
         ldap_username_attribute: Input[str],
@@ -49,8 +52,11 @@ class SREGiteaServerProps:
         self.database_username = (
             database_username if database_username else "postgresadmin"
         )
+        self.dns_monitor_application_id = dns_monitor_application_id
+        self.dns_monitor_application_secret = dns_monitor_application_secret
         self.dns_server_ip = dns_server_ip
         self.dockerhub_credentials = dockerhub_credentials
+        self.entra_tenant_id = entra_tenant_id
         self.ldap_server_hostname = ldap_server_hostname
         self.ldap_server_port = ldap_server_port
         self.ldap_username_attribute = ldap_username_attribute
@@ -86,6 +92,17 @@ class SREGiteaServerComponent(ComponentResource):
             account_name=props.storage_account_name,
             resource_group_name=props.resource_group_name,
             share_name="gitea-caddy",
+            share_quota=1,
+            signed_identifiers=[],
+            opts=child_opts,
+        )
+
+        file_share_gitea_dns_monitor = storage.FileShare(
+            f"{self._name}_file_share_gitea_dns_monitor",
+            access_tier=storage.ShareAccessTier.TRANSACTION_OPTIMIZED,
+            account_name=props.storage_account_name,
+            resource_group_name=props.resource_group_name,
+            share_name="gitea-dns-monitor",
             share_quota=1,
             signed_identifiers=[],
             opts=child_opts,
@@ -135,6 +152,7 @@ class SREGiteaServerComponent(ComponentResource):
         gitea_configure_sh_reader = FileReader(
             resources_path / "gitea" / "gitea" / "configure.mustache.sh"
         )
+
         gitea_configure_sh = Output.all(
             admin_email="dshadmin@example.com",
             admin_username="dshadmin",
@@ -176,6 +194,25 @@ class SREGiteaServerComponent(ComponentResource):
             ),
             opts=ResourceOptions.merge(
                 child_opts, ResourceOptions(parent=file_share_gitea_gitea)
+            ),
+        )
+
+        # Upload DNS Monitor Script
+        dns_monitor_script_reader = FileReader(
+            resources_path / "dns_monitor" / "init.sh"
+        )
+
+        file_share_gitea_dns_monitor_script = FileShareFile(
+            f"{self._name}_file_share_gitea_dns_monitor_script",
+            FileShareFileProps(
+                destination_path=dns_monitor_script_reader.name,
+                share_name=file_share_gitea_dns_monitor.name,
+                file_contents=Output.secret(dns_monitor_script_reader.file_contents()),
+                storage_account_key=props.storage_account_key,
+                storage_account_name=props.storage_account_name,
+            ),
+            opts=ResourceOptions.merge(
+                child_opts, ResourceOptions(parent=file_share_gitea_caddy)
             ),
         )
 
@@ -301,6 +338,49 @@ class SREGiteaServerComponent(ComponentResource):
             dns_config=containerinstance.DnsConfigurationArgs(
                 name_servers=[props.dns_server_ip],
             ),
+            init_containers=[
+                containerinstance.InitContainerDefinitionArgs(
+                    name="dnsmonitor"[:63],
+                    command=["/bin/sh", "-c", "/mnt/init/init.sh"],
+                    environment_variables=[
+                        containerinstance.EnvironmentVariableArgs(
+                            name="RESOURCE_GROUP", value=props.resource_group_name
+                        ),
+                        containerinstance.EnvironmentVariableArgs(
+                            name="SERVICE_PRINCIPAL_APPID",
+                            value=props.dns_monitor_application_id,
+                        ),
+                        containerinstance.EnvironmentVariableArgs(
+                            name="SERVICE_PRINCIPAL_PASSWORD",
+                            secure_value=props.dns_monitor_application_secret,
+                        ),
+                        containerinstance.EnvironmentVariableArgs(
+                            name="ENTRA_TENANT_ID",
+                            value=props.entra_tenant_id,
+                        ),
+                        containerinstance.EnvironmentVariableArgs(
+                            name="RECORD_NAME",
+                            value="gitea",
+                        ),
+                        containerinstance.EnvironmentVariableArgs(
+                            name="CONTAINER_GROUP_NAME",
+                            value=f"{stack_name}-container-group-gitea",
+                        ),
+                        containerinstance.EnvironmentVariableArgs(
+                            name="PRIVATE_ZONE_NAME",
+                            value=Output.concat("privatelink.", props.sre_fqdn),
+                        ),
+                    ],
+                    image="mcr.microsoft.com/azure-cli:latest",
+                    volume_mounts=[
+                        containerinstance.VolumeMountArgs(
+                            mount_path="/mnt/init",
+                            name="gitea-dns-monitor",
+                            read_only=True,
+                        )
+                    ],
+                )
+            ],
             # Required due to DockerHub rate-limit: https://docs.docker.com/docker-hub/download-rate-limit/
             image_registry_credentials=[
                 {
@@ -353,6 +433,14 @@ class SREGiteaServerComponent(ComponentResource):
                     ),
                     name="gitea-app-custom",
                 ),
+                containerinstance.VolumeArgs(
+                    azure_file=containerinstance.AzureFileVolumeArgs(
+                        share_name=file_share_gitea_dns_monitor.name,
+                        storage_account_key=props.storage_account_key,
+                        storage_account_name=props.storage_account_name,
+                    ),
+                    name="gitea-dns-monitor",
+                ),
             ],
             opts=ResourceOptions.merge(
                 child_opts,
@@ -362,6 +450,7 @@ class SREGiteaServerComponent(ComponentResource):
                         file_share_gitea_caddy_caddyfile,
                         file_share_gitea_gitea_configure_sh,
                         file_share_gitea_gitea_entrypoint_sh,
+                        file_share_gitea_dns_monitor_script,
                     ],
                     replace_on_changes=["containers"],
                 ),
