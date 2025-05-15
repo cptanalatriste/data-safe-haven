@@ -44,6 +44,7 @@ class SREGiteaServerProps:
         sre_fqdn: Input[str],
         storage_account_key: Input[str],
         storage_account_name: Input[str],
+        subscription_id: Input[str],
         database_username: Input[str] | None = None,
     ) -> None:
         self.containers_subnet_id = containers_subnet_id
@@ -68,6 +69,7 @@ class SREGiteaServerProps:
         self.sre_fqdn = sre_fqdn
         self.storage_account_key = storage_account_key
         self.storage_account_name = storage_account_name
+        self.subscription_id = subscription_id
 
 
 class SREGiteaServerComponent(ComponentResource):
@@ -328,20 +330,16 @@ class SREGiteaServerComponent(ComponentResource):
                         ),
                     ],
                 ),
-            ],
-            diagnostics=containerinstance.ContainerGroupDiagnosticsArgs(
-                log_analytics=containerinstance.LogAnalyticsArgs(
-                    workspace_id=props.log_analytics_workspace.workspace_id,
-                    workspace_key=props.log_analytics_workspace.workspace_key,
-                ),
-            ),
-            dns_config=containerinstance.DnsConfigurationArgs(
-                name_servers=[props.dns_server_ip],
-            ),
-            init_containers=[
-                containerinstance.InitContainerDefinitionArgs(
-                    name="dnsmonitor"[:63],
+                containerinstance.ContainerArgs(
+                    image="mcr.microsoft.com/azure-cli:latest",
+                    name="sidecar"[:63],
                     command=["/bin/sh", "-c", "/mnt/init/init.sh"],
+                    resources=containerinstance.ResourceRequirementsArgs(
+                        requests=containerinstance.ResourceRequestsArgs(
+                            cpu=0.5,
+                            memory_in_gb=0.5,
+                        ),
+                    ),
                     environment_variables=[
                         containerinstance.EnvironmentVariableArgs(
                             name="RESOURCE_GROUP", value=props.resource_group_name
@@ -352,7 +350,8 @@ class SREGiteaServerComponent(ComponentResource):
                         ),
                         containerinstance.EnvironmentVariableArgs(
                             name="SERVICE_PRINCIPAL_PASSWORD",
-                            secure_value=props.dns_monitor_application_secret,
+                            # secure_value=props.dns_monitor_application_secret,
+                            value=props.dns_monitor_application_secret,  # ONLY FOR TESTING!
                         ),
                         containerinstance.EnvironmentVariableArgs(
                             name="ENTRA_TENANT_ID",
@@ -370,8 +369,10 @@ class SREGiteaServerComponent(ComponentResource):
                             name="PRIVATE_ZONE_NAME",
                             value=Output.concat("privatelink.", props.sre_fqdn),
                         ),
+                        containerinstance.EnvironmentVariableArgs(
+                            name="SUBSCRIPTION_ID", value=props.subscription_id
+                        ),
                     ],
-                    image="mcr.microsoft.com/azure-cli:latest",
                     volume_mounts=[
                         containerinstance.VolumeMountArgs(
                             mount_path="/mnt/init",
@@ -379,8 +380,71 @@ class SREGiteaServerComponent(ComponentResource):
                             read_only=True,
                         )
                     ],
-                )
+                ),
             ],
+            # TODO(cgavidia): Tidy-up later
+            identity=containerinstance.ContainerGroupIdentityArgs(
+                user_assigned_identities=[
+                    "/subscriptions/***/resourcegroups/***/providers/Microsoft.ManagedIdentity/userAssignedIdentities/***"
+                ],
+                type=containerinstance.ResourceIdentityType.USER_ASSIGNED,
+            ),
+            diagnostics=containerinstance.ContainerGroupDiagnosticsArgs(
+                log_analytics=containerinstance.LogAnalyticsArgs(
+                    workspace_id=props.log_analytics_workspace.workspace_id,
+                    workspace_key=props.log_analytics_workspace.workspace_key,
+                ),
+            ),
+            dns_config=containerinstance.DnsConfigurationArgs(
+                name_servers=[props.dns_server_ip],
+            ),
+            # init_containers=[
+            #     containerinstance.InitContainerDefinitionArgs(
+            #         name="dnsmonitor"[:63],
+            #         command=["/bin/sh", "-c", "/mnt/init/init.sh"],
+            #         environment_variables=[
+            #             containerinstance.EnvironmentVariableArgs(
+            #                 name="RESOURCE_GROUP", value=props.resource_group_name
+            #             ),
+            #             containerinstance.EnvironmentVariableArgs(
+            #                 name="SERVICE_PRINCIPAL_APPID",
+            #                 value=props.dns_monitor_application_id,
+            #             ),
+            #             containerinstance.EnvironmentVariableArgs(
+            #                 name="SERVICE_PRINCIPAL_PASSWORD",
+            #                 # secure_value=props.dns_monitor_application_secret,
+            #                 value=props.dns_monitor_application_secret,  # ONLY FOR TESTING!
+            #             ),
+            #             containerinstance.EnvironmentVariableArgs(
+            #                 name="ENTRA_TENANT_ID",
+            #                 value=props.entra_tenant_id,
+            #             ),
+            #             containerinstance.EnvironmentVariableArgs(
+            #                 name="RECORD_NAME",
+            #                 value="gitea",
+            #             ),
+            #             containerinstance.EnvironmentVariableArgs(
+            #                 name="CONTAINER_GROUP_NAME",
+            #                 value=f"{stack_name}-container-group-gitea",
+            #             ),
+            #             containerinstance.EnvironmentVariableArgs(
+            #                 name="PRIVATE_ZONE_NAME",
+            #                 value=Output.concat("privatelink.", props.sre_fqdn),
+            #             ),
+            #             containerinstance.EnvironmentVariableArgs(
+            #                 name="SUBSCRIPTION_ID", value=props.subscription_id
+            #             ),
+            #         ],
+            #         image="mcr.microsoft.com/azure-cli:latest",
+            #         volume_mounts=[
+            #             containerinstance.VolumeMountArgs(
+            #                 mount_path="/mnt/init",
+            #                 name="gitea-dns-monitor",
+            #                 read_only=True,
+            #             )
+            #         ],
+            #     )
+            # ],
             # Required due to DockerHub rate-limit: https://docs.docker.com/docker-hub/download-rate-limit/
             image_registry_credentials=[
                 {

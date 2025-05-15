@@ -195,6 +195,7 @@ class DeclarativeSRE:
                 subnet_clamav_mirror=networking.subnet_clamav_mirror,
                 subnet_firewall=networking.subnet_firewall,
                 subnet_firewall_management=networking.subnet_firewall_management,
+                subnet_user_services_containers=networking.subnet_user_services_containers,
                 subnet_guacamole_containers=networking.subnet_guacamole_containers,
                 subnet_identity_containers=networking.subnet_identity_containers,
                 subnet_user_services_software_repositories=networking.subnet_user_services_software_repositories,
@@ -365,6 +366,7 @@ class DeclarativeSRE:
                 subnet_containers_support=networking.subnet_user_services_containers_support,
                 subnet_databases=networking.subnet_user_services_databases,
                 subnet_software_repositories=networking.subnet_user_services_software_repositories,
+                subscription_id=self.config.azure.subscription_id,
             ),
             tags=self.tags,
         )

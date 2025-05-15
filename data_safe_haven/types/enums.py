@@ -29,6 +29,7 @@ class AzureSdkCredentialScope(str, Enum):
 @verify(UNIQUE)
 class AzureServiceTag(str, Enum):
     INTERNET = "Internet"
+    AZURE_RESOURCE_MANAGER = "AzureResourceManager"
 
 
 @verify(UNIQUE)
@@ -72,6 +73,7 @@ class FirewallPriorities(int, Enum):
     SRE_USER_SERVICES_SOFTWARE_REPOSITORIES = 3400
     SRE_WORKSPACES = 3500
     SRE_WORKSPACES_DENY = 3550
+    SRE_USER_SERVICES = 3600
 
 
 @verify(UNIQUE)
@@ -99,6 +101,7 @@ class NetworkingPriorities(int, Enum):
     AZURE_LOAD_BALANCER = 200
     AZURE_MONITORING_SOURCES = 300
     AZURE_PLATFORM_DNS = 400
+    AZURE_MICROSOFT_ONLINE_SERVICES = 500
     # DNS connections: 1000-1499
     INTERNAL_SRE_DNS_SERVERS = 1000
     # SRE connections: 1500-2999
@@ -158,6 +161,7 @@ class PermittedDomains(tuple[str, ...], Enum):
     MICROSOFT_GRAPH_API = ("graph.microsoft.com",)
     MICROSOFT_LOGIN = ("login.microsoftonline.com",)
     MICROSOFT_IDENTITY = MICROSOFT_GRAPH_API + MICROSOFT_LOGIN
+    AZURE_RESOURCE_MANAGER = "management.azure.com"
     RSTUDIO_DEB = ("download1.rstudio.org",)
     SOFTWARE_REPOSITORIES_PYTHON = (
         "files.pythonhosted.org",

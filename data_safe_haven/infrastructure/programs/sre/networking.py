@@ -1057,6 +1057,18 @@ class SRENetworkingComponent(ComponentResource):
                 ),
                 network.SecurityRuleArgs(
                     access=network.SecurityRuleAccess.ALLOW,
+                    description="Allow outbound connections to Microsoft Online Service Auth.",
+                    destination_address_prefix="AzureActiveDirectory",
+                    destination_port_range=Ports.HTTPS,
+                    direction=network.SecurityRuleDirection.OUTBOUND,
+                    name="AllowMicrosoftOnlineAuth",
+                    priority=NetworkingPriorities.AZURE_MICROSOFT_ONLINE_SERVICES,
+                    protocol=network.SecurityRuleProtocol.TCP,
+                    source_address_prefix=SREIpRanges.user_services_containers.prefix,
+                    source_port_range="*",
+                ),
+                network.SecurityRuleArgs(
+                    access=network.SecurityRuleAccess.ALLOW,
                     description="Allow outbound connections to DNS servers.",
                     destination_address_prefix=SREDnsIpRanges.vnet.prefix,
                     destination_port_ranges=[Ports.DNS],

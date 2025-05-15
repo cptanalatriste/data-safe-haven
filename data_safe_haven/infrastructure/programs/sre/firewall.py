@@ -11,6 +11,7 @@ from data_safe_haven.infrastructure.common import (
 )
 from data_safe_haven.infrastructure.components import WrappedLogAnalyticsWorkspace
 from data_safe_haven.types import (
+    AzureServiceTag,
     FirewallPriorities,
     ForbiddenDomains,
     PermittedDomains,
@@ -33,6 +34,7 @@ class SREFirewallProps:
         subnet_clamav_mirror: Input[network.GetSubnetResult],
         subnet_firewall: Input[network.GetSubnetResult],
         subnet_firewall_management: Input[network.GetSubnetResult],
+        subnet_user_services_containers: Input[network.GetSubnetResult],
         subnet_guacamole_containers: Input[network.GetSubnetResult],
         subnet_identity_containers: Input[network.GetSubnetResult],
         subnet_user_services_software_repositories: Input[network.GetSubnetResult],
@@ -51,6 +53,9 @@ class SREFirewallProps:
         ).apply(get_address_prefixes_from_subnet)
         self.subnet_identity_containers_prefixes = Output.from_input(
             subnet_identity_containers
+        ).apply(get_address_prefixes_from_subnet)
+        self.subnet_user_services_containers_prefixes = Output.from_input(
+            subnet_user_services_containers
         ).apply(get_address_prefixes_from_subnet)
         self.subnet_firewall_id = Output.from_input(subnet_firewall).apply(
             get_id_from_subnet
@@ -181,8 +186,29 @@ class SREFirewallComponent(ComponentResource):
                                 protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTPS,
                             )
                         ],
-                        source_addresses=props.subnet_identity_containers_prefixes,
+                        source_addresses=props.subnet_user_services_containers_prefixes,
                         target_fqdns=PermittedDomains.MICROSOFT_IDENTITY,
+                    ),
+                ],
+            ),
+            network.AzureFirewallApplicationRuleCollectionArgs(
+                action=network.AzureFirewallRCActionArgs(
+                    type=network.AzureFirewallRCActionType.ALLOW
+                ),
+                name="dns-monitor-allow",
+                priority=FirewallPriorities.SRE_USER_SERVICES,
+                rules=[
+                    network.AzureFirewallApplicationRuleArgs(
+                        description="Allow MIcrosoft OAuth Login requests",
+                        name="AllowMicrosoftOAuthLogin",
+                        protocols=[
+                            network.AzureFirewallApplicationRuleProtocolArgs(
+                                port=int(Ports.HTTPS),
+                                protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTPS,
+                            )
+                        ],
+                        source_addresses=props.subnet_user_services_containers_prefixes,
+                        target_fqdns=PermittedDomains.MICROSOFT_LOGIN,
                     ),
                 ],
             ),
@@ -242,11 +268,32 @@ class SREFirewallComponent(ComponentResource):
             ),
         ]
 
+        network_rule_collections = [
+            network.AzureFirewallNetworkRuleCollectionArgs(
+                action=network.AzureFirewallRCActionArgs(
+                    type=network.AzureFirewallRCActionType.ALLOW
+                ),
+                name="dns-monitor-allow",
+                priority=FirewallPriorities.SRE_USER_SERVICES,
+                rules=[
+                    network.AzureFirewallNetworkRuleArgs(
+                        description="Allow Azure Resource Manager requests.",
+                        destination_addresses=[AzureServiceTag.AZURE_RESOURCE_MANAGER],
+                        destination_ports=[Ports.HTTPS],
+                        name="allow-azure-resource-manager",
+                        protocols=[network.AzureFirewallNetworkRuleProtocol.ANY],
+                        # source_addresses=props.subnet_user_services_containers_prefixes,
+                        source_addresses=["*"],  # Only for testing
+                    )
+                ],
+            ),
+        ]
+
         if props.allow_workspace_internet:
             application_rule_collections = application_rule_collections_common
             # A network rule is used as application rules are restricted to certain
             # types of traffic, e.g. HTTP, HTTPS
-            network_rule_collections = [
+            network_rule_collections += [
                 network.AzureFirewallNetworkRuleCollectionArgs(
                     action=network.AzureFirewallRCActionArgs(
                         type=network.AzureFirewallRCActionType.ALLOW
@@ -339,7 +386,7 @@ class SREFirewallComponent(ComponentResource):
                     ],
                 ),
             ]
-            network_rule_collections = None
+            # network_rule_collections = None
 
         # Deploy firewall
         self.firewall = network.AzureFirewall(

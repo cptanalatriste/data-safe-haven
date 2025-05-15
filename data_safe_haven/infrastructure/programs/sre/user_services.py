@@ -51,6 +51,7 @@ class SREUserServicesProps:
         subnet_containers_support: Input[network.GetSubnetResult],
         subnet_databases: Input[network.GetSubnetResult],
         subnet_software_repositories: Input[network.GetSubnetResult],
+        subscription_id: Input[str],
     ) -> None:
         self.database_service_admin_password = database_service_admin_password
         self.databases = databases
@@ -87,6 +88,7 @@ class SREUserServicesProps:
         self.subnet_software_repositories_id = Output.from_input(
             subnet_software_repositories
         ).apply(get_id_from_subnet)
+        self.subscription_id = subscription_id
 
 
 class SREUserServicesComponent(ComponentResource):
@@ -128,6 +130,7 @@ class SREUserServicesComponent(ComponentResource):
                 sre_fqdn=props.sre_fqdn,
                 storage_account_key=props.storage_account_key,
                 storage_account_name=props.storage_account_name,
+                subscription_id=props.subscription_id,
             ),
             opts=child_opts,
             tags=child_tags,

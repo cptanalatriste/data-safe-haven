@@ -41,7 +41,9 @@ class SREEntraComponent(ComponentResource):
     """Deploy SRE Entra resources with Pulumi"""
 
     azure_role_ids: ClassVar[dict[str, str]] = {
-        "DNS Zone Contributor": "befefa01-2a29-4197-83a8-272ff33ce314"
+        "DNS Zone Contributor": "befefa01-2a29-4197-83a8-272ff33ce314",
+        "Azure Container Instances Contributor Role": "5d977122-f97e-4b4d-a52f-6b43003ddb4d",
+        "Contributor": "b24988ac-6180-42a0-ab88-20f7382dd24c",
     }
 
     def __init__(
@@ -150,19 +152,53 @@ class SREEntraComponent(ComponentResource):
             display_name="DNS Monitor Authentication Secret",
         )
 
-        # Grant "DNS Zone Contributor" permissions to the Service Principal.
+        # # Grant "DNS Zone Contributor" permissions to the Service Principal.
+        # authorization.RoleAssignment(
+        #     f"{self._name}_dns_zone_contributor_role_assignment",
+        #     principal_id=self.dns_monitor_application.application_service_principal.object_id,
+        #     principal_type=authorization.PrincipalType.SERVICE_PRINCIPAL,
+        #     role_assignment_name=str(seeded_uuid(f"{stack_name} DNS Zone Contributor")),
+        #     role_definition_id=Output.concat(
+        #         "/subscriptions/",
+        #         props.subscription_id,
+        #         "/providers/Microsoft.Authorization/roleDefinitions/",
+        #         self.azure_role_ids["DNS Zone Contributor"],
+        #     ),
+        #     scope=props.resource_group_id,
+        #     opts=child_opts,
+        # )
+
+        # # Grant "Azure Container Instances Contributor Role" permissions to the Service Principal.
+        # authorization.RoleAssignment(
+        #     f"{self._name}_container_instances_contributor_role_assignment",
+        #     principal_id=self.dns_monitor_application.application_service_principal.object_id,
+        #     principal_type=authorization.PrincipalType.SERVICE_PRINCIPAL,
+        #     role_assignment_name=str(
+        #         seeded_uuid(f"{stack_name} Container Instances Contributor")
+        #     ),
+        #     role_definition_id=Output.concat(
+        #         "/subscriptions/",
+        #         props.subscription_id,
+        #         "/providers/Microsoft.Authorization/roleDefinitions/",
+        #         self.azure_role_ids["Azure Container Instances Contributor Role"],
+        #     ),
+        #     scope=props.resource_group_id,
+        #     opts=child_opts,
+        # )
+
+        # Grant "Contributor" permissions to the Service Principal.
         authorization.RoleAssignment(
-            f"{self._name}_dns_zone_contributor_role_assignment",
+            f"{self._name}_contributor_role_assignment",
             principal_id=self.dns_monitor_application.application_service_principal.object_id,
             principal_type=authorization.PrincipalType.SERVICE_PRINCIPAL,
-            role_assignment_name=str(seeded_uuid(f"{stack_name} DNS Zone Contributor")),
+            role_assignment_name=str(seeded_uuid(f"{stack_name} Contributor")),
             role_definition_id=Output.concat(
                 "/subscriptions/",
                 props.subscription_id,
                 "/providers/Microsoft.Authorization/roleDefinitions/",
-                self.azure_role_ids["DNS Zone Contributor"],
+                self.azure_role_ids["Contributor"],
             ),
-            scope=props.resource_group_id,
+            scope=f"subscriptions/{props.subscription_id}",  # TODO(cgavidia): Only for testing!
             opts=child_opts,
         )
 
