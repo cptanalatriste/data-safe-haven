@@ -72,9 +72,10 @@ class FirewallPriorities(int, Enum):
     SRE_DNS_SIDECAR = 3200
     SRE_GUACAMOLE_CONTAINERS = 3300
     SRE_IDENTITY_CONTAINERS = 3400
-    SRE_USER_SERVICES_SOFTWARE_REPOSITORIES = 3500
-    SRE_WORKSPACES = 3600
-    SRE_WORKSPACES_DENY = 3650
+    SRE_USER_SERVICES_GITEA_MIRROR = 3500
+    SRE_USER_SERVICES_SOFTWARE_REPOSITORIES = 3600
+    SRE_WORKSPACES = 3700
+    SRE_WORKSPACES_DENY = 3750
 
 
 @verify(UNIQUE)
@@ -173,6 +174,7 @@ class PermittedDomains(tuple[str, ...], Enum):
     )
 
     RSTUDIO_DEB = ("download1.rstudio.org",)
+    SOFTWARE_REPOSITORIES_GITHUB = ("api.github.com",)
     SOFTWARE_REPOSITORIES_PYTHON = (
         "files.pythonhosted.org",
         "pypi.org",
@@ -196,6 +198,7 @@ class PermittedDomains(tuple[str, ...], Enum):
                 + MICROSOFT_GRAPH_API
                 + MICROSOFT_LOGIN
                 + RSTUDIO_DEB
+                + SOFTWARE_REPOSITORIES_GITHUB
                 + SOFTWARE_REPOSITORIES_PYTHON
                 + SOFTWARE_REPOSITORIES_R
                 + UBUNTU_KEYSERVER

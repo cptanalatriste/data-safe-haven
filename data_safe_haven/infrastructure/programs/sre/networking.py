@@ -1359,6 +1359,127 @@ class SRENetworkingComponent(ComponentResource):
             opts=child_opts,
             tags=child_tags,
         )
+
+        nsg_user_services_gitea_mirror = network.NetworkSecurityGroup(
+            f"{self._name}_nsg_user_services_gitea_mirror_repositories",
+            location=props.location,
+            network_security_group_name=f"{stack_name}-nsg-user-services-gitea-mirror",
+            resource_group_name=props.resource_group_name,
+            security_rules=[
+                # Inbound
+                network.SecurityRuleArgs(  # ONLY FOR TESTING!!! Remove this later.
+                    access=network.SecurityRuleAccess.ALLOW,
+                    description="Allow inbound connections from SRE workspaces.",
+                    destination_address_prefix=SREIpRanges.user_services_gitea_mirror.prefix,
+                    destination_port_ranges=[Ports.HTTP, Ports.HTTPS, Ports.SQUID],
+                    direction=network.SecurityRuleDirection.INBOUND,
+                    name="AllowWorkspacesInbound",
+                    priority=NetworkingPriorities.INTERNAL_SRE_WORKSPACES,
+                    protocol=network.SecurityRuleProtocol.TCP,
+                    source_address_prefix=SREIpRanges.workspaces.prefix,
+                    source_port_range="*",
+                ),
+                network.SecurityRuleArgs(
+                    access=network.SecurityRuleAccess.DENY,
+                    description="Deny all other inbound traffic.",
+                    destination_address_prefix="*",
+                    destination_port_range="*",
+                    direction=network.SecurityRuleDirection.INBOUND,
+                    name="DenyAllOtherInbound",
+                    priority=NetworkingPriorities.ALL_OTHER,
+                    protocol=network.SecurityRuleProtocol.ASTERISK,
+                    source_address_prefix="*",
+                    source_port_range="*",
+                ),
+                # Outbound
+                network.SecurityRuleArgs(
+                    access=network.SecurityRuleAccess.DENY,
+                    description="Deny outbound connections to Azure Platform DNS endpoints (including 168.63.129.16), which are not included in the 'Internet' service tag.",
+                    destination_address_prefix="AzurePlatformDNS",
+                    destination_port_range="*",
+                    direction=network.SecurityRuleDirection.OUTBOUND,
+                    name="DenyAzurePlatformDnsOutbound",
+                    priority=NetworkingPriorities.AZURE_PLATFORM_DNS,
+                    protocol=network.SecurityRuleProtocol.ASTERISK,
+                    source_address_prefix="*",
+                    source_port_range="*",
+                ),
+                network.SecurityRuleArgs(
+                    access=network.SecurityRuleAccess.ALLOW,
+                    description="Allow outbound connections to DNS servers.",
+                    destination_address_prefix=SREDnsIpRanges.vnet.prefix,
+                    destination_port_ranges=[Ports.DNS],
+                    direction=network.SecurityRuleDirection.OUTBOUND,
+                    name="AllowDNSServersOutbound",
+                    priority=NetworkingPriorities.INTERNAL_SRE_DNS_SERVERS,
+                    protocol=network.SecurityRuleProtocol.ASTERISK,
+                    source_address_prefix=SREIpRanges.user_services_gitea_mirror.prefix,
+                    source_port_range="*",
+                ),
+                network.SecurityRuleArgs(
+                    access=network.SecurityRuleAccess.ALLOW,
+                    description="Allow outbound connections to configuration data endpoints.",
+                    destination_address_prefix=SREIpRanges.data_configuration.prefix,
+                    destination_port_range="*",
+                    direction=network.SecurityRuleDirection.OUTBOUND,
+                    name="AllowDataConfigurationEndpointsOutbound",
+                    priority=NetworkingPriorities.INTERNAL_SRE_DATA_CONFIGURATION,
+                    protocol=network.SecurityRuleProtocol.ASTERISK,
+                    source_address_prefix=SREIpRanges.user_services_gitea_mirror.prefix,
+                    source_port_range="*",
+                ),
+                network.SecurityRuleArgs(  # ONLY FOR TESTING!! Remove later.
+                    access=network.SecurityRuleAccess.ALLOW,
+                    description="Allow LDAP client requests over TCP.",
+                    destination_address_prefix=SREIpRanges.identity_containers.prefix,
+                    destination_port_ranges=[Ports.LDAP_APRICOT],
+                    direction=network.SecurityRuleDirection.OUTBOUND,
+                    name="AllowIdentityServersOutbound",
+                    priority=NetworkingPriorities.INTERNAL_SRE_IDENTITY_CONTAINERS,
+                    protocol=network.SecurityRuleProtocol.TCP,
+                    source_address_prefix=SREIpRanges.user_services_gitea_mirror.prefix,
+                    source_port_range="*",
+                ),
+                network.SecurityRuleArgs(  # TODO: We need to define if we need another DB for the mirror.
+                    access=network.SecurityRuleAccess.ALLOW,
+                    description="Allow outbound connections to container support services.",
+                    destination_address_prefix=SREIpRanges.user_services_containers_support.prefix,
+                    destination_port_ranges=[Ports.POSTGRESQL],
+                    direction=network.SecurityRuleDirection.OUTBOUND,
+                    name="AllowUserServicesContainersSupportOutbound",
+                    priority=NetworkingPriorities.INTERNAL_SRE_USER_SERVICES_CONTAINERS_SUPPORT,
+                    protocol=network.SecurityRuleProtocol.TCP,
+                    source_address_prefix=SREIpRanges.user_services_gitea_mirror.prefix,
+                    source_port_range="*",
+                ),
+                network.SecurityRuleArgs(
+                    access=network.SecurityRuleAccess.ALLOW,
+                    description="Allow outbound connections to external repositories over the internet.",
+                    destination_address_prefix="Internet",
+                    destination_port_ranges=[Ports.HTTP, Ports.HTTPS],
+                    direction=network.SecurityRuleDirection.OUTBOUND,
+                    name="AllowPackagesInternetOutbound",
+                    priority=NetworkingPriorities.EXTERNAL_INTERNET,
+                    protocol=network.SecurityRuleProtocol.TCP,
+                    source_address_prefix=SREIpRanges.user_services_gitea_mirror.prefix,
+                    source_port_range="*",
+                ),
+                network.SecurityRuleArgs(
+                    access=network.SecurityRuleAccess.DENY,
+                    description="Deny all other outbound traffic.",
+                    destination_address_prefix="*",
+                    destination_port_range="*",
+                    direction=network.SecurityRuleDirection.OUTBOUND,
+                    name="DenyAllOtherOutbound",
+                    priority=NetworkingPriorities.ALL_OTHER,
+                    protocol=network.SecurityRuleProtocol.ASTERISK,
+                    source_address_prefix="*",
+                    source_port_range="*",
+                ),
+            ],
+            opts=child_opts,
+            tags=child_tags,
+        )
         nsg_workspaces = network.NetworkSecurityGroup(
             f"{self._name}_nsg_workspaces",
             location=props.location,
@@ -1671,6 +1792,7 @@ class SRENetworkingComponent(ComponentResource):
         subnet_user_services_software_repositories_name = (
             "UserServicesSoftwareRepositoriesSubnet"
         )
+        subnet_user_services_gitea_mirror_name = "UserServicesGiteaMirrorSubnet"
         subnet_workspaces_name = "WorkspacesSubnet"
         subnet_dns_sidecar_name = "DnsSidecarSubnet"
         sre_virtual_network = network.VirtualNetwork(
@@ -1882,6 +2004,15 @@ class SRENetworkingComponent(ComponentResource):
                     ),
                     route_table=network.RouteTableArgs(id=route_table.id),
                 ),
+                # User services Gitea mirror
+                network.SubnetArgs(
+                    address_prefix=SREIpRanges.user_services_software_repositories.prefix,
+                    name=subnet_user_services_gitea_mirror_name,
+                    network_security_group=network.NetworkSecurityGroupArgs(
+                        id=nsg_user_services_gitea_mirror.id
+                    ),
+                    route_table=network.RouteTableArgs(id=route_table.id),
+                ),
                 # Workspaces
                 network.SubnetArgs(
                     address_prefix=SREIpRanges.workspaces.prefix,
@@ -2036,21 +2167,21 @@ class SRENetworkingComponent(ComponentResource):
             private_zone_name=sre_private_dns_zone.name,
             registration_enabled=False,
             resource_group_name=props.resource_group_name,
-            virtual_network=network.SubResourceArgs(id=props.dns_virtual_network_id),
+            virtual_network=network.SubResourceArgs(id=props.dns_virtual_network_id),  # type: ignore
             virtual_network_link_name=Output.concat(
                 "link-to-", props.dns_virtual_network_name
             ),
             opts=ResourceOptions.merge(
                 child_opts, ResourceOptions(parent=sre_private_dns_zone)
             ),
-        )
+        )  # type: ignore
 
         # Link Azure private DNS zones to virtual network
         # Note that although the DNS virtual network is already linked to these zones,
         # Azure Container Instances do not have an IP address during deployment and so
         # must use default Azure DNS when setting up file mounts. This means that we
         # need to be able to resolve the "Storage Account" private DNS zones.
-        for dns_zone_name, private_dns_zone in props.dns_private_zones.items():
+        for dns_zone_name, private_dns_zone in props.dns_private_zones.items():  # type: ignore
             privatedns.VirtualNetworkLink(
                 replace_separators(
                     f"{self._name}_private_zone_{dns_zone_name}_vnet_link", "_"
@@ -2059,7 +2190,9 @@ class SRENetworkingComponent(ComponentResource):
                 private_zone_name=private_dns_zone.name,
                 registration_enabled=False,
                 resource_group_name=props.resource_group_name,
-                virtual_network=network.SubResourceArgs(id=sre_virtual_network.id),
+                virtual_network=network.SubResourceArgs(
+                    id=sre_virtual_network.id
+                ),  # pyright: ignore[reportArgumentType]
                 virtual_network_link_name=Output.concat(
                     "link-to-", sre_virtual_network.name
                 ),
@@ -2067,7 +2200,7 @@ class SRENetworkingComponent(ComponentResource):
                     child_opts, ResourceOptions(parent=sre_virtual_network)
                 ),
                 tags=child_tags,
-            )
+            )  # type: ignore
 
         # Register outputs
         self.route_table_name = route_table.name
@@ -2164,6 +2297,13 @@ class SRENetworkingComponent(ComponentResource):
             resource_group_name=props.resource_group_name,
             virtual_network_name=sre_virtual_network.name,
         )
+
+        self.subnet_user_services_gitea_mirror = network.get_subnet_output(
+            subnet_name=subnet_user_services_gitea_mirror_name,
+            resource_group_name=props.resource_group_name,
+            virtual_network_name=sre_virtual_network.name,
+        )
+
         self.subnet_workspaces = network.get_subnet_output(
             subnet_name=subnet_workspaces_name,
             resource_group_name=props.resource_group_name,

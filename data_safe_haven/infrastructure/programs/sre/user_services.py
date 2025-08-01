@@ -48,6 +48,7 @@ class SREUserServicesProps:
         storage_account_name: Input[str],
         subnet_containers: Input[network.GetSubnetResult],
         subnet_containers_support: Input[network.GetSubnetResult],
+        subnet_gitea_mirror: Input[network.GetSubnetResult],
         subnet_databases: Input[network.GetSubnetResult],
         subnet_software_repositories: Input[network.GetSubnetResult],
     ) -> None:
@@ -77,6 +78,9 @@ class SREUserServicesProps:
         self.subnet_containers_support_id = Output.from_input(
             subnet_containers_support
         ).apply(get_id_from_subnet)
+        self.subnet_gitea_mirror_id = Output.from_input(subnet_gitea_mirror).apply(
+            get_id_from_subnet
+        )
         self.subnet_databases_id = Output.from_input(subnet_databases).apply(
             get_id_from_subnet
         )
@@ -105,7 +109,9 @@ class SREUserServicesComponent(ComponentResource):
             "sre_gitea_server",
             stack_name,
             SREGiteaServerProps(
-                containers_subnet_id=props.subnet_containers_id,
+                # ONLY FOR TESTING!!
+                # containers_subnet_id=props.subnet_containers_id,
+                containers_subnet_id=props.subnet_gitea_mirror_id,
                 database_subnet_id=props.subnet_containers_support_id,
                 database_password=props.gitea_database_password,
                 dns_server_ip=props.dns_server_ip,
