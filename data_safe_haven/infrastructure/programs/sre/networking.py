@@ -1500,6 +1500,22 @@ class SRENetworkingComponent(ComponentResource):
                     source_port_range="*",
                 )
             )
+
+            # TODO(cgavidia): Only for testing! Remove later
+            nsg_workspaces_security_rules.append(
+                network.SecurityRuleArgs(
+                    access=network.SecurityRuleAccess.ALLOW,
+                    description="Allow outbound connections to user services gitea mirror.",
+                    destination_address_prefix=SREIpRanges.user_services_gitea_mirror.prefix,
+                    destination_port_ranges=[Ports.HTTP, Ports.HTTPS, Ports.SQUID],
+                    direction=network.SecurityRuleDirection.OUTBOUND,
+                    name="AllowUserServicesSGiteaMirrorOutbound",
+                    priority=NetworkingPriorities.INTERNAL_SRE_USER_SERVICES_SOFTWARE_REPOSITORIES,
+                    protocol=network.SecurityRuleProtocol.TCP,
+                    source_address_prefix=SREIpRanges.workspaces.prefix,
+                    source_port_range="*",
+                )
+            )
         self.nsg_workspaces = network.NetworkSecurityGroup(
             f"{self._name}_nsg_workspaces",
             location=props.location,
@@ -2364,7 +2380,7 @@ class SRENetworkingComponent(ComponentResource):
         ):
             subnets.append(
                 network.SubnetArgs(
-                    address_prefix=SREIpRanges.user_services_software_repositories.prefix,
+                    address_prefix=SREIpRanges.user_services_gitea_mirror.prefix,
                     delegations=[
                         network.DelegationArgs(
                             name="SubnetDelegationContainerGroups",
