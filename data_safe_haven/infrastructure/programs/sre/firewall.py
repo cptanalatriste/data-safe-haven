@@ -37,6 +37,7 @@ class SREFirewallProps:
         subnet_firewall_management: Input[network.GetSubnetResult],
         subnet_guacamole_containers: Input[network.GetSubnetResult],
         subnet_identity_containers: Input[network.GetSubnetResult],
+        subnet_user_services_gitea_mirror: Input[network.GetSubnetResult],
         subnet_user_services_software_repositories: (
             Input[network.GetSubnetResult] | None
         ),
@@ -69,6 +70,10 @@ class SREFirewallProps:
         ).apply(get_id_from_subnet)
         self.subnet_guacamole_containers_prefixes = Output.from_input(
             subnet_guacamole_containers
+        ).apply(get_address_prefixes_from_subnet)
+
+        self.subnet_user_services_gitea_mirror_prefixes = Output.from_input(
+            subnet_user_services_gitea_mirror
         ).apply(get_address_prefixes_from_subnet)
 
         self.subnet_user_services_software_repositories_prefixes: (
@@ -392,6 +397,48 @@ class SREFirewallComponent(ComponentResource):
                             ],
                             source_addresses=props.subnet_user_services_software_repositories_prefixes,
                             target_fqdns=PermittedDomains.SOFTWARE_REPOSITORIES_PYTHON,
+                        ),
+                    ],
+                ),
+                network.AzureFirewallApplicationRuleCollectionArgs(
+                    action=network.AzureFirewallRCActionArgs(
+                        type=network.AzureFirewallRCActionType.ALLOW
+                    ),
+                    name="gitea-mirror-allow",
+                    priority=FirewallPriorities.SRE_USER_SERVICES_GITEA_MIRROR,
+                    rules=[
+                        network.AzureFirewallApplicationRuleArgs(
+                            description="Allow external GitHub repository requests",
+                            name="AllowGitHubRepositoryDownload",
+                            protocols=[
+                                network.AzureFirewallApplicationRuleProtocolArgs(
+                                    port=int(Ports.HTTPS),
+                                    protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTPS,
+                                )
+                            ],
+                            source_addresses=props.subnet_user_services_gitea_mirror_prefixes,
+                            target_fqdns=PermittedDomains.SOFTWARE_REPOSITORIES_GITHUB,
+                        ),
+                    ],
+                ),
+                network.AzureFirewallApplicationRuleCollectionArgs(
+                    action=network.AzureFirewallRCActionArgs(
+                        type=network.AzureFirewallRCActionType.ALLOW
+                    ),
+                    name="gitea-mirror-allow",
+                    priority=FirewallPriorities.SRE_USER_SERVICES_GITEA_MIRROR,
+                    rules=[
+                        network.AzureFirewallApplicationRuleArgs(
+                            description="Allow external GitHub repository requests",
+                            name="AllowGitHubRepositoryDownload",
+                            protocols=[
+                                network.AzureFirewallApplicationRuleProtocolArgs(
+                                    port=int(Ports.HTTPS),
+                                    protocol_type=network.AzureFirewallApplicationRuleProtocolType.HTTPS,
+                                )
+                            ],
+                            source_addresses=props.subnet_user_services_gitea_mirror_prefixes,
+                            target_fqdns=PermittedDomains.SOFTWARE_REPOSITORIES_GITHUB,
                         ),
                     ],
                 ),
