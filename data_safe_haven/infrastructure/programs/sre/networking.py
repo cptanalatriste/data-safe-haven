@@ -1510,7 +1510,7 @@ class SRENetworkingComponent(ComponentResource):
                     destination_port_ranges=[Ports.HTTP, Ports.HTTPS, Ports.SQUID],
                     direction=network.SecurityRuleDirection.OUTBOUND,
                     name="AllowUserServicesSGiteaMirrorOutbound",
-                    priority=NetworkingPriorities.INTERNAL_SRE_USER_SERVICES_SOFTWARE_REPOSITORIES,
+                    priority=NetworkingPriorities.INTERNAL_SRE_USER_SERVICES_GITEA_MIRROR,
                     protocol=network.SecurityRuleProtocol.TCP,
                     source_address_prefix=SREIpRanges.workspaces.prefix,
                     source_port_range="*",
